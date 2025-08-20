@@ -2,7 +2,7 @@ from django.db import models
 from django.utils import timezone
 # Create your models here.
 
-class ticket(models.Model):
+class Ticket(models.Model):
     title = models.CharField(max_length=50)
     priority = models.CharField(max_length=50)
     description = models.TextField()
