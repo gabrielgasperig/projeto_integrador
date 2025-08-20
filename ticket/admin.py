@@ -5,4 +5,10 @@ from ticket import models
 
 @admin.register(models.Ticket)
 class TicketAdmin(admin.ModelAdmin):
-    ...
+    list_display = 'id', 'title', 'description', 'priority',
+    ordering = '-id',
+    search_fields = 'id', 'title', 'description', 'priority', 'user',
+    list_display_links = 'id',
+    list_filter = 'created_date'
+    list_per_page = 10
+    list_max_show_all = 200

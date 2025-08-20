@@ -10,3 +10,5 @@ class Ticket(models.Model):
     email = models.EmailField(max_length=254, blank=True)
     ceated_date = models.DateTimeField(default=timezone.now)
     
+    def __str__(self):
+        return f'{self.title} | {self.description} | {self.priority}'
