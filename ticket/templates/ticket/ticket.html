@@ -1,0 +1,15 @@
+{% extends "global/base.html" %}
+
+{% block content %}
+    <div class="single-ticket">
+        <h1 class="single-ticket-name">
+            {{ticket.title}}
+        </h1>
+
+        <p><b>ID:</b> {{ ticket.id }}</p>
+        <p><b>User:</b> {{ ticket.user }}</p>
+        <p><b>Priority:</b> {{ ticket.priority.name }}</p>
+        <p><b>Created date:</b> {{ ticket.created_date }}</p>
+        <p><b>Description:</b> {{ ticket.description }}</p>
+    </div>
+{% endblock content %}
