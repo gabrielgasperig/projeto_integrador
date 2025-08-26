@@ -1,6 +1,7 @@
 {% extends "global/base.html" %}
 
 {% block content %}
+{% if page_obj %}
     <div class="resposive-table">
         <table class="tickets-table">
             <caption class="table-caption">
@@ -16,7 +17,7 @@
                     <th class="table-header">Created date</th>
                 </tr>
             </thead>
-            {% for ticket in tickets %}
+            {% for ticket in page_obj %}
                 <tr class="table-row">
                     <td class="table-cel">
                         <a href="{% url 'ticket:ticket' ticket.id %}">
@@ -42,4 +43,11 @@
             {% endfor %}
         </table>
     </div>
+{% else %}
+    <div class="single-ticket">
+        <h1 class="single-ticket-name">
+            No tickets found.
+        </h1>
+    </div>
+{% endif %}
 {% endblock content %}
