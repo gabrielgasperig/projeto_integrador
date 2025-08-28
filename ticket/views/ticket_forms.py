@@ -7,9 +7,15 @@ from ticket.forms import TicketForm
 
 def create(request):
     if request.method == 'POST':
+        form = TicketForm(request.POST)
+
         context = {
-            'form': TicketForm(request.POST),
+            'form': form
         }
+
+        if form.is_valid():
+            form.save()
+            return redirect('ticket:create')
 
         return render(
             request,

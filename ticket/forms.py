@@ -8,13 +8,31 @@ class TicketForm(forms.ModelForm):
         
         self.fields['title'].widget.attrs.update({'placeholder': 'Enter ticket title'})
         self.fields['description'].widget.attrs.update({'placeholder': 'Enter ticket description'})
-        self.fields['description'].help_text = 'Enter ticket description'
-        self.fields['user'].widget.attrs.update({'placeholder': 'Select user'})
+        self.fields['priority'].help_text = 'Select priority level'
+        self.fields['picture'].help_text = 'Upload a picture'
 
     class Meta:
         model = models.Ticket
-        fields = 'title', 'description', 'priority','user', 
+        fields = 'title', 'description', 'priority','picture', 
 
         widgets = {
             'description': forms.Textarea(attrs={'rows': 4}),
         }
+
+
+    '''
+    def clean(self):
+        cleaned_data = self.cleaned_data
+        title = cleaned_data.get('title')
+        description = cleaned_data.get('description')
+
+        if title == description:
+            msg = ValidationError(
+                'Título não pode ser igual à descrição',
+                code='invalid'
+            )
+            self.add_error('title', msg)
+            self.add_error('description', msg)
+
+        return super().clean()
+    '''
