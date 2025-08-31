@@ -9,5 +9,6 @@ urlpatterns = [
     
     # ticket (CRUD)
     path('ticket/<int:ticket_id>/detail/', views.ticket, name='ticket'),
-    path('ticket/create/', views.create, name='create'),
+    path('ticket/create/', views.create, name='create'),\
+    path('ticket/<int:ticket_id>/update/', views.update, name='update'),
 ]

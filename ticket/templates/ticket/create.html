@@ -6,7 +6,7 @@
     <h2>New Ticket</h2>
     
     <form 
-      action="{% url 'ticket:create' %}"
+      action="{{ form_action }}"
       method="POST"
       enctype="multipart/form-data"
     >

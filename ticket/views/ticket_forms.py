@@ -1,21 +1,23 @@
-from django.shortcuts import render, get_object_or_404, redirect
-from django.db.models import Q
-from django.core.paginator import Paginator
+from django.shortcuts import render, redirect, get_object_or_404
+from django.urls import reverse
 
-from ticket.models import Ticket
 from ticket.forms import TicketForm
+from ticket.models import Ticket
 
 def create(request):
+    form_action = reverse('ticket:create')
+
     if request.method == 'POST':
         form = TicketForm(request.POST)
 
         context = {
-            'form': form
+            'form': form,
+            'form_action': form_action,
         }
 
         if form.is_valid():
             form.save()
-            return redirect('ticket:create')
+            return redirect('ticket:update', ticket_id=ticket.pk)
 
         return render(
             request,
@@ -25,6 +27,40 @@ def create(request):
 
     context = {
         'form': TicketForm(),
+        'form_action': form_action,
+    }
+
+    return render(
+        request,
+        'ticket/create.html',
+        context
+    )
+
+def update(request, ticket_id):
+    ticket = get_object_or_404(Ticket, pk=ticket_id, show=True)
+    form_action = reverse('ticket:update', args=(ticket_id,))
+
+    if request.method == 'POST':
+        form = TicketForm(request.POST, instance=ticket)
+
+        context = {
+            'form': form,
+            'form_action': form_action,
+        }
+
+        if form.is_valid():
+            form.save()
+            return redirect('ticket:update', ticket_id=ticket.pk)
+
+        return render(
+            request,
+            'ticket/create.html',
+            context
+        )
+
+    context = {
+        'form': TicketForm(instance=ticket),
+        'form_action': form_action,
     }
 
     return render(
