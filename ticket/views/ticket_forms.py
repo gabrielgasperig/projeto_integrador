@@ -16,7 +16,7 @@ def create(request):
         }
 
         if form.is_valid():
-            form.save()
+            ticket = form.save()
             return redirect('ticket:update', ticket_id=ticket.pk)
 
         return render(
@@ -68,3 +68,15 @@ def update(request, ticket_id):
         'ticket/create.html',
         context
     )
+
+def delete(request, ticket_id):
+    ticket = get_object_or_404(Ticket, pk=ticket_id, show=True)
+
+    confirmation = request.POST.get('confirmation', 'no')
+    print('confirmation', confirmation)
+
+    if confirmation == 'yes':
+        ticket.delete()
+        return redirect('ticket:index')
+    
+    return render(request, 'ticket/ticket.html', {'ticket': ticket, 'confirmation': confirmation})
