@@ -8,7 +8,7 @@ def create(request):
     form_action = reverse('ticket:create')
 
     if request.method == 'POST':
-        form = TicketForm(request.POST)
+        form = TicketForm(request.POST, request.FILES)
 
         context = {
             'form': form,
@@ -41,7 +41,7 @@ def update(request, ticket_id):
     form_action = reverse('ticket:update', args=(ticket_id,))
 
     if request.method == 'POST':
-        form = TicketForm(request.POST, instance=ticket)
+        form = TicketForm(request.POST, request.FILES, instance=ticket)
 
         context = {
             'form': form,
