@@ -3,14 +3,12 @@
 {% block content %}
   <div class="form-wrapper">
 
-    <h2>New Ticket</h2>
+    <h2>Register</h2>
     
     <form 
       action="{{ form_action }}"
       method="POST"
-      enctype="multipart/form-data"
     >
-
     {% csrf_token %}
 
       <div class="form-content">
@@ -19,17 +17,12 @@
           <div class="form-group">
             <label for="{{ field.id_for_label }}">{{ field.label }}</label>
             {{ field }}
+            {{ field.errors }}
 
             {% if field.help_text %}
               <p class="help-text">{{ field.help_text }}</p>
             {% endif %}
           </div>
-
-          {% if field.name == 'picture' and field.value.url %}
-          <div class="form-group">
-              <img src="{{ field.value.url }}" alt="" style="max-width: 200px; max-height: 200px;">
-          </div>
-            {% endif %}
         {% endfor %}
       </div>
 
@@ -42,7 +35,7 @@
             </div>
         </div>
       {% endif %}
-      
+
       <div class="form-content">
         <div class="form-group">
           <button class="btn" type="submit">Send</button>
@@ -51,5 +44,4 @@
 
     </form>
   </div>
-
 {% endblock content %}

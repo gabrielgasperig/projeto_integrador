@@ -12,4 +12,7 @@ urlpatterns = [
     path('ticket/create/', views.create, name='create'),\
     path('ticket/<int:ticket_id>/update/', views.update, name='update'),
     path('ticket/<int:ticket_id>/delete/', views.delete, name='delete'),
+
+    # user
+    path('user/create/', views.register, name='register'),
 ]
