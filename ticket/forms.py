@@ -7,7 +7,7 @@ from django.core.exceptions import ValidationError
 from . import models
 
 class TicketForm(forms.ModelForm):
-    picture = forms.ImageField(widget=forms.FileInput(attrs={'accept': 'image/*'}))
+    picture = forms.ImageField(widget=forms.FileInput(attrs={'accept': 'image/*'}), required=False)
     class Meta:
         model = models.Ticket
         fields = 'title', 'description', 'priority','picture',
