@@ -1,34 +1,67 @@
 from django.db import models
-from django.utils import timezone
-from django.contrib.auth.models import User
+from django.conf import settings
 
-# Create your models here.
+
 class Priority(models.Model):
-    class Meta:
-        verbose_name = 'Priority'
-        verbose_name_plural = 'Priorities'        
-
-    name = models.CharField(max_length=50)
-
+    name = models.CharField(max_length=50, unique=True)
     def __str__(self):
         return self.name
 
 class Ticket(models.Model):
-    title = models.CharField(max_length=50)
-    priority = models.ForeignKey(
-        Priority, 
-        on_delete=models.SET_NULL, 
-        blank=True, null=True)
-    user = models.CharField(max_length=50)
-    email = models.EmailField(max_length=254, blank=True)
-    created_date = models.DateTimeField(default=timezone.now)
-    description = models.TextField()
-    show = models.BooleanField(default=True)
-    picture = models.ImageField(blank=True, upload_to='pictures/%Y/%m/')
-    owner = models.ForeignKey(
-        User, 
-        on_delete=models.SET_NULL, 
-        blank=True, null=True)
     
+    STATUS_CHOICES = [
+        ('Aberto', 'Aberto'),
+        ('Em Andamento', 'Em Andamento'),
+        ('Fechado', 'Fechado'),
+    ]
+    title = models.CharField(max_length=100, verbose_name="Título")
+    description = models.TextField(verbose_name="Descrição")
+    owner = models.ForeignKey(settings.AUTH_USER_MODEL, on_delete=models.CASCADE, related_name='owned_tickets')
+    created_date = models.DateTimeField(auto_now_add=True)
+    show = models.BooleanField(default=True)
+    priority = models.ForeignKey(Priority, on_delete=models.SET_NULL, null=True, blank=True, verbose_name="Prioridade")
+    status = models.CharField(max_length=20, choices=STATUS_CHOICES, default='Aberto')
+    assigned_to = models.ForeignKey(settings.AUTH_USER_MODEL, on_delete=models.SET_NULL, null=True, blank=True, related_name='assigned_tickets')
+
+    RATING_CHOICES = [
+        (1, '⭐ Péssimo'),
+        (2, '⭐⭐ Ruim'),
+        (3, '⭐⭐⭐ Regular'),
+        (4, '⭐⭐⭐⭐ Bom'),
+        (5, '⭐⭐⭐⭐⭐ Ótimo'),
+    ]
+    rating = models.IntegerField(choices=RATING_CHOICES, null=True, blank=True, verbose_name="Avaliação")
+    feedback = models.TextField(blank=True, null=True, verbose_name="Feedback do Utilizador")
+
     def __str__(self):
-        return f'{self.title} | {self.description} | {self.priority}'
+        return self.title
+class TicketImage(models.Model):
+    ticket = models.ForeignKey(Ticket, on_delete=models.CASCADE, related_name='images')
+    image = models.ImageField(upload_to='ticket_pictures/%Y/%m/')
+    uploaded_at = models.DateTimeField(auto_now_add=True)
+
+    def __str__(self):
+        return f"Imagem para o ticket #{self.ticket.id}"
+    
+class TicketEvent(models.Model):
+    
+    EVENT_CHOICES = [
+        ('CRIAÇÃO', 'Criação'),
+        ('COMENTÁRIO', 'Comentário'),
+        ('EDIÇÃO', 'Edição'),
+        ('STATUS', 'Mudança de Status'),
+        ('CONCLUSÃO', 'Conclusão'),
+        ('EXCLUSÃO', 'Exclusão'),
+        ('AVALIAÇÃO', 'Avaliação'),
+    ]
+    ticket = models.ForeignKey(Ticket, on_delete=models.CASCADE, related_name='events')
+    user = models.ForeignKey(settings.AUTH_USER_MODEL, on_delete=models.SET_NULL, null=True)
+    event_type = models.CharField(max_length=20, choices=EVENT_CHOICES)
+    description = models.TextField(help_text="Descreve o evento. Pode ser um comentário, a solução, o motivo da exclusão, etc.")
+    created_date = models.DateTimeField(auto_now_add=True)
+
+    class Meta:
+        ordering = ['created_date']
+
+    def __str__(self):
+        return f'{self.event_type} por {self.user.username} em {self.ticket.title}'

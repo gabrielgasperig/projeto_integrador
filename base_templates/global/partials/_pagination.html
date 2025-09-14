@@ -1,19 +1,56 @@
-{% if page_obj %}
-    <div class="pagination">
-        <span class="step-links">
-            {% if page_obj.has_previous %}
-                <a href="?page=1&q={{ request.GET.get.q.strip }}">&laquo; first</a>
-                <a href="?page={{ page_obj.previous_page_number }}&q={{ request.GET.get.q.strip }}">previous</a>
-            {% endif %}
+{% if page_obj.paginator.num_pages > 1 %}
+<nav class="mt-8 flex justify-center" aria-label="Pagination">
+    <ul class="inline-flex items-center -space-x-px rounded-md shadow-sm">
+        
 
-            <span class="current">
-                Page {{ page_obj.number }} of {{ page_obj.paginator.num_pages }}.
-            </span>
+        {% if page_obj.has_previous %}
+            <li>
+                <a href="?page={{ page_obj.previous_page_number }}{% if request.GET.status %}&status={{ request.GET.status }}{% endif %}{% if request.GET.priority %}&priority={{ request.GET.priority }}{% endif %}{% if search_value %}&q={{ search_value }}{% endif %}"
+                   class="inline-flex items-center px-3 py-2 text-sm font-semibold text-gray-700 bg-white rounded-l-md ring-1 ring-inset ring-gray-300 hover:bg-gray-50 focus:z-20">
+                   <svg class="h-5 w-5" viewBox="0 0 20 20" fill="currentColor" aria-hidden="true"><path fill-rule="evenodd" d="M12.79 5.23a.75.75 0 01-.02 1.06L8.832 10l3.938 3.71a.75.75 0 11-1.04 1.08l-4.5-4.25a.75.75 0 010-1.08l4.5-4.25a.75.75 0 011.06.02z" clip-rule="evenodd" /></svg>
+                </a>
+            </li>
+        {% else %}
+            <li>
+                <span class="inline-flex items-center px-3 py-2 text-sm font-semibold text-gray-400 bg-white rounded-l-md ring-1 ring-inset ring-gray-300 cursor-not-allowed">
+                    <svg class="h-5 w-5" viewBox="0 0 20 20" fill="currentColor" aria-hidden="true"><path fill-rule="evenodd" d="M12.79 5.23a.75.75 0 01-.02 1.06L8.832 10l3.938 3.71a.75.75 0 11-1.04 1.08l-4.5-4.25a.75.75 0 010-1.08l4.5-4.25a.75.75 0 011.06.02z" clip-rule="evenodd" /></svg>
+                </span>
+            </li>
+        {% endif %}
 
-            {% if page_obj.has_next %}
-                <a href="?page={{ page_obj.next_page_number }}&q={{ request.GET.get.q.strip }}">next</a>
-                <a href="?page={{ page_obj.paginator.num_pages }}&q={{ request.GET.get.q.strip }}">last &raquo;</a>
+
+        {% for i in page_obj.paginator.page_range %}
+            {% if i == page_obj.number %}
+                <li>
+                    <span aria-current="page" class="relative z-10 inline-flex items-center bg-indigo-600 px-4 py-2 text-sm font-semibold text-white focus:z-20">{{ i }}</span>
+                </li>
+            {% elif i > page_obj.number|add:'-3' and i < page_obj.number|add:'3' %}
+                <li>
+                    <a href="?page={{ i }}{% if request.GET.status %}&status={{ request.GET.status }}{% endif %}{% if request.GET.priority %}&priority={{ request.GET.priority }}{% endif %}{% if search_value %}&q={{ search_value }}{% endif %}"
+                       class="inline-flex items-center px-4 py-2 text-sm font-semibold text-gray-900 ring-1 ring-inset ring-gray-300 hover:bg-gray-50 focus:z-20">{{ i }}</a>
+                </li>
+            {% elif i == page_obj.number|add:'-3' or i == page_obj.number|add:'3' %}
+                <li>
+                   <span class="inline-flex items-center px-4 py-2 text-sm font-semibold text-gray-700 ring-1 ring-inset ring-gray-300">...</span>
+                </li>
             {% endif %}
-        </span>
-    </div>
+        {% endfor %}
+
+        
+        {% if page_obj.has_next %}
+            <li>
+                <a href="?page={{ page_obj.next_page_number }}{% if request.GET.status %}&status={{ request.GET.status }}{% endif %}{% if request.GET.priority %}&priority={{ request.GET.priority }}{% endif %}{% if search_value %}&q={{ search_value }}{% endif %}"
+                   class="inline-flex items-center px-3 py-2 text-sm font-semibold text-gray-700 bg-white rounded-r-md ring-1 ring-inset ring-gray-300 hover:bg-gray-50 focus:z-20">
+                   <svg class="h-5 w-5" viewBox="0 0 20 20" fill="currentColor" aria-hidden="true"><path fill-rule="evenodd" d="M7.21 14.77a.75.75 0 01.02-1.06L11.168 10 7.23 6.29a.75.75 0 111.04-1.08l4.5 4.25a.75.75 0 010 1.08l-4.5 4.25a.75.75 0 01-1.06-.02z" clip-rule="evenodd" /></svg>
+                </a>
+            </li>
+        {% else %}
+            <li>
+                <span class="inline-flex items-center px-3 py-2 text-sm font-semibold text-gray-400 bg-white rounded-r-md ring-1 ring-inset ring-gray-300 cursor-not-allowed">
+                    <svg class="h-5 w-5" viewBox="0 0 20 20" fill="currentColor" aria-hidden="true"><path fill-rule="evenodd" d="M7.21 14.77a.75.75 0 01.02-1.06L11.168 10 7.23 6.29a.75.75 0 111.04-1.08l4.5 4.25a.75.75 0 010 1.08l-4.5 4.25a.75.75 0 01-1.06-.02z" clip-rule="evenodd" /></svg>
+                </span>
+            </li>
+        {% endif %}
+    </ul>
+</nav>
 {% endif %}

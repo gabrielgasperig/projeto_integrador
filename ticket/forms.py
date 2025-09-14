@@ -1,154 +1,150 @@
 from django import forms
+from . import models
 from django.contrib.auth.forms import UserCreationForm
 from django.contrib.auth.models import User
-from django.contrib.auth import password_validation
 from django.core.exceptions import ValidationError
 
 from . import models
 
 class TicketForm(forms.ModelForm):
-    picture = forms.ImageField(widget=forms.FileInput(attrs={'accept': 'image/*'}), required=False)
+    images = forms.ImageField(
+        label="Anexar Imagens",
+        widget=forms.FileInput(),
+        required=False
+    )
     class Meta:
         model = models.Ticket
-        fields = 'title', 'description', 'priority','picture',
-
-    def clean(self):
-        cleaned_data = self.cleaned_data
-        title = cleaned_data.get('title')
-        description = cleaned_data.get('description')
-
-        if title == description:
-            msg = ValidationError(
-                'Primeiro nome não pode ser igual ao segundo',
-                code='invalid'
-            )
-            self.add_error('title', msg)
-            self.add_error('description', msg)
-
-        return super().clean()
+        fields = 'title', 'description', 'priority',
 
     def clean_title(self):
         title = self.cleaned_data.get('title')
-
-        if title == 'ABC':
-            self.add_error(
-                'title',
-                ValidationError(
-                    'Veio do add_error',
-                    code='invalid'
-                )
-            )
-
+        if len(title) < 5:
+            raise ValidationError('O título precisa ter pelo menos 5 caracteres.', code='invalid')
         return title
 
+
 class RegisterForm(UserCreationForm):
-    first_name = forms.CharField(required=True, min_length=3)
-    last_name = forms.CharField(required=True, min_length=3)
-    email = forms.EmailField()
+    first_name = forms.CharField(required=True, min_length=3, label='Nome')
+    last_name = forms.CharField(required=True, min_length=3, label='Sobrenome')
+    email = forms.EmailField(required=True, label='E-mail')
+
+    def __init__(self, *args, **kwargs):
+        super().__init__(*args, **kwargs)
+        for field_name, field in self.fields.items():
+            field.help_text = None
+
     class Meta:
         model = User
-        fields = 'first_name', 'last_name', 'email', 'username', 'password1', 'password2',
+        fields = 'first_name', 'last_name', 'email', 'username',
     
     def clean_email(self):
         email = self.cleaned_data.get('email')
-
         if User.objects.filter(email=email).exists():
-            self.add_error('email', ValidationError(
-                'Email já cadastrado',
-                code='invalid'
-)) 
-
+            raise ValidationError('Este e-mail já está cadastrado.', code='invalid')
         return email
     
 class RegisterUpdateForm(forms.ModelForm):
     first_name = forms.CharField(
-        min_length=3,
-        max_length=30,
-        required=True,
-        help_text='Required.',
-        error_messages={
-            'min_length': 'Please, add more than 2 letters.'
-        }
+        min_length=3, max_length=30, required=True, label='Nome'
     )
     last_name = forms.CharField(
-        min_length=3,
-        max_length=30,
-        required=True,
-        help_text='Required.'
+        min_length=3, max_length=30, required=True, label='Sobrenome'
     )
+    email = forms.EmailField(required=True)
 
-    password1 = forms.CharField(
-        label="Password",
+    password = forms.CharField(
+        label="Nova Senha",
         strip=False,
         widget=forms.PasswordInput(attrs={"autocomplete": "new-password"}),
-        help_text=password_validation.password_validators_help_text_html(),
+        help_text="Deixe em branco para não alterar.",
         required=False,
     )
 
     password2 = forms.CharField(
-        label="Password 2",
+        label="Confirmação da Nova Senha",
         strip=False,
         widget=forms.PasswordInput(attrs={"autocomplete": "new-password"}),
-        help_text='Use the same password as before.',
         required=False,
     )
-
     class Meta:
         model = User
         fields = (
             'first_name', 'last_name', 'email',
             'username',
         )
-
     def save(self, commit=True):
-        cleaned_data = self.cleaned_data
         user = super().save(commit=False)       
-        password = cleaned_data.get('password1')
-
+        password = self.cleaned_data.get('password')
         if password:
             user.set_password(password)
-
         if commit:
             user.save()
-
         return user
-
     def clean(self):
-        password1 = self.cleaned_data.get('password1')
-        password2 = self.cleaned_data.get('password2')
-
-        if password1 or password2:
-            if password1 != password2:
-                self.add_error(
-                    'password2',
-                    ValidationError('Senhas não batem')
-                )
-
-        return super().clean()
-
+        cleaned_data = super().clean()
+        password = cleaned_data.get('password')
+        password2 = cleaned_data.get('password2')
+        if password and password != password2:
+            self.add_error('password2', ValidationError('As senhas não batem.'))
+        return cleaned_data
     def clean_email(self):
         email = self.cleaned_data.get('email')
-        current_email = self.instance.email
-
-        if current_email != email:
-            if User.objects.filter(email=email).exists():
-                self.add_error(
-                    'email',
-                    ValidationError('Já existe este e-mail', code='invalid')
-                )
-
+        if self.instance and self.instance.pk:
+            if email != self.instance.email and User.objects.filter(email=email).exists():
+                raise ValidationError('Este e-mail já está em uso por outra conta.')
         return email
+    
+class ConcludeTicketForm(forms.Form):
+    solution = forms.CharField(
+        label="Solução do Problema",
+        required=True,
+        widget=forms.Textarea(
+            attrs={
+                'rows': 4,
+                'placeholder': 'Descreva detalhadamente a solução aplicada para este ticket.'
+            }
+        )
+    )
 
-    def clean_password1(self):
-        password1 = self.cleaned_data.get('password1')
+class DeleteTicketForm(forms.Form):
+    reason = forms.CharField(
+        label="Motivo da Exclusão",
+        required=True,
+        widget=forms.Textarea(
+            attrs={
+                'rows': 3,
+                'placeholder': 'Descreva por que este ticket está sendo excluído.'
+            }
+        )
+    )
 
-        if password1:
-            try:
-                password_validation.validate_password(password1)
-            except ValidationError as errors:
-                self.add_error(
-                    'password1',
-                    ValidationError(errors)
-                )
+class RatingForm(forms.ModelForm):
+    class Meta:
+        model = models.Ticket
+  
+        fields = ['rating', 'feedback']
 
-        return password1
+        widgets = {
+            'rating': forms.Select(attrs={'class': 'form-select'}),
+            'feedback': forms.Textarea(attrs={'rows': 3, 'placeholder': 'Deixe um comentário sobre o atendimento (opcional)...'}),
+        }
+
+        labels = {
+            'rating': 'A sua avaliação sobre o atendimento',
+            'feedback': 'Comentário Adicional',
+        }
+
+class TransferTicketForm(forms.Form):
+
+    new_admin = forms.ModelChoiceField(
+        queryset=User.objects.filter(is_staff=True),
+        label="Transferir para o Administrador",
+        empty_label="Selecione um administrador"
+    )
+
+    def __init__(self, *args, **kwargs):
+        current_admin = kwargs.pop('current_admin', None)
+        super().__init__(*args, **kwargs)
+        if current_admin:
+            self.fields['new_admin'].queryset = User.objects.filter(is_staff=True).exclude(pk=current_admin.pk)
+

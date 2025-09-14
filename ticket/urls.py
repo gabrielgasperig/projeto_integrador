@@ -1,21 +1,25 @@
 from django.urls import path
-from ticket import views
+from . import views
 
 app_name = 'ticket'
 
 urlpatterns = [
+    # URLs principais da aplicação
     path('', views.index, name='index'),
     path('search/', views.search, name='search'),
     
-    # ticket (CRUD)
-    path('ticket/<int:ticket_id>/detail/', views.ticket, name='ticket'),
-    path('ticket/create/', views.create, name='create'),\
+    # URLs para ações relacionadas a um Ticket específico
+    path('ticket/create/', views.create, name='create'),
+    path('ticket/<int:ticket_id>/', views.ticket_detail, name='ticket_detail'),
     path('ticket/<int:ticket_id>/update/', views.update, name='update'),
     path('ticket/<int:ticket_id>/delete/', views.delete, name='delete'),
+    path('ticket/<int:ticket_id>/assign/', views.assign_ticket, name='assign_ticket'),
+    path('ticket/<int:ticket_id>/conclude/', views.conclude_ticket, name='conclude_ticket'),
+    path('ticket/<int:ticket_id>/transfer/', views.transfer_ticket, name='transfer_ticket'),
 
-    # user
-    path('user/create/', views.register, name='register'),
-    path('user/login/', views.login_view, name='login'),
-    path('user/logout/', views.logout_view, name='logout'),
-    path('user/update/', views.user_update, name='user_update'),
+    # URLs de Autenticação e Perfil de Utilizador
+    path('register/', views.register_view, name='register'),
+    path('login/', views.login_view, name='login'),
+    path('logout/', views.logout_view, name='logout'),
+    path('profile/', views.user_update, name='user_update'),
 ]

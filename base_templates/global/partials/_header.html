@@ -1,49 +1,66 @@
-<header class="header">
-    <h1 class="header-heading">
-        <a href="{% url 'ticket:index' %}" class="header-link">
-            Helpdesk
+<header class="flex items-center justify-between px-8 bg-gray-800 h-20 text-white sticky top-0 z-50">
+    <logo class="text-2xl font-bold">
+        <a href="{% url 'ticket:index' %}" class="flex items-center gap-1">
+            <img class="h-8 -mt-1" src="https://img.icons8.com/?size=48&id=wJVDOwCZqokW&format=png&color=000000" alt="icon">
+           <span>Gesticket</span> 
         </a>
-    </h1>
+    </logo>
 
-    <nav class="menu">
-        <ul class="menu-list">
-
-            {% if request.user.is_authenticated %}
-            <li class="menu-item">
-                <a href="{% url "ticket:create" %}" class="menu-link">
-                    Create
-                </a>
-            </li>
-            <li class="menu-item">
-                <a href="{% url "ticket:user_update" %}" class="menu-link">
-                    Profile
-                </a>
-            </li>
-            <li class="menu-item">
-                <a href="{% url "ticket:logout" %}" class="menu-link">
-                    Logout
-                </a>
-            </li>
-            {% else %}
-            <li class="menu-item">
-                <a href="{% url "ticket:user_update" %}" class="menu-link">
-                    Login
-                </a>
-            </li>
-            <li class="menu-item">
-                <a href="{% url "ticket:register" %}" class="menu-link">
-                    Register
-                </a>
-            </li>
-            {% endif %}
-
-        </ul>
-    </nav>
-
-    <div class="search">
+    <div>
         <form action="{% url 'ticket:search' %}" method="GET">
-            <input type="search" placeholder="Search..." class="search-input" id="search" name="q" value="{{ request.GET.q.strip }}">
+            <input type="search" placeholder="Buscar..." class="bg-gray-700 text-white rounded-lg px-4 py-2 focus:outline-none focus:ring-2 focus:ring-blue-500" id="search" name="q" value="{{ request.GET.q.strip }}">
         </form>
     </div>
 
+<nav>
+        <ul class="flex items-center gap-4">
+            {% if request.user.is_authenticated %}
+            
+            <li class="relative" x-data="{ open: false }" @click.away="open = false">
+               
+                <a class="flex items-center gap-3 cursor-pointer p-2 rounded-lg hover:bg-gray-700" @click.prevent="open = !open" href="#">
+                    
+                    <div class="flex items-center justify-center h-8 w-8 rounded-full bg-gray-700 text-white font-bold text-sm select-none">
+                        {% if request.user.first_name and request.user.last_name %}
+                            {{ request.user.first_name|first|upper }}{{ request.user.last_name|first|upper }}
+                        {% else %}
+                            {{ request.user.username|first|upper }}
+                        {% endif %}
+                    </div>
+
+                    <span>{{ request.user.first_name }} {{ request.user.last_name }}</span>
+                    <svg class="w-4 h-4 text-gray-400 transition-transform" :class="{'rotate-180': open}" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 20" fill="currentColor"><path fill-rule="evenodd" d="M5.23 7.21a.75.75 0 011.06.02L10 11.168l3.71-3.938a.75.75 0 111.08 1.04l-4.25 4.5a.75.75 0 01-1.08 0l-4.25-4.5a.75.75 0 01.02-1.06z" clip-rule="evenodd" /></svg>
+                </a>
+
+                <div class="absolute right-0 mt-2 bg-white text-black shadow-lg rounded-lg w-40 p-2 z-20" x-show="open" x-transition>
+                    <ul class="[&>li>a]:p-2 [&>li>a]:rounded [&>li>a]:block [&>li:hover]:bg-gray-100">
+                        <li>
+                            <a href="{% url "ticket:user_update" %}">
+                                Perfil
+                            </a>
+                        </li>
+                        <li>
+                            <a href="{% url "ticket:logout" %}">
+                                Sair
+                            </a>
+                        </li>
+                    </ul>
+                </div>
+            </li>
+            
+            {% else %}
+
+            <li>
+                <a href="{% url "ticket:login" %}" class="p-2 rounded-lg hover:bg-gray-700">
+                    Entrar
+                </a>
+            </li>
+            <li>
+                <a href="{% url "ticket:register" %}" class="p-2 rounded-lg hover:bg-gray-700">
+                    Registrar
+                </a>
+            </li>
+            {% endif %}
+        </ul>
+    </nav>
 </header>
