@@ -46,7 +46,7 @@ def ticket_detail(request, ticket_id):
     is_owner = ticket.owner == request.user
     is_admin = request.user.is_staff
     if not (is_owner or is_admin):
-        messages.error(request, 'Não tem permissão para ver este chamado.')
+        messages.error(request, 'Não tem permissão para ver este ticket.')
         return redirect('ticket:index')
 
     rating_form = RatingForm(instance=ticket)
@@ -84,6 +84,7 @@ def ticket_detail(request, ticket_id):
         'delete_form': DeleteTicketForm(),
         'rating_form': rating_form,
         'transfer_form': TransferTicketForm(current_admin=ticket.assigned_to),
+        'site_title': 'Ticket',
     }
     return render(request, 'ticket/ticket.html', context)
 
@@ -102,10 +103,10 @@ def create(request):
 
         TicketEvent.objects.create(
             ticket=ticket, user=request.user, event_type='CRIAÇÃO',
-            description=f'Chamado criado com {len(images)} anexo(s).'
+            description=f'Ticket criado com {len(images)} anexo(s).'
         )
         
-        messages.success(request, 'Chamado criado com sucesso!')
+        messages.success(request, 'Ticket criado com sucesso!')
         return redirect('ticket:ticket_detail', ticket_id=ticket.pk)
     else:
         if request.method == 'POST':
@@ -131,12 +132,13 @@ def update(request, ticket_id):
             for img in images:
                 TicketImage.objects.create(ticket=ticket, image=img)
             messages.info(request, f'{len(images)} nova(s) imagem(ns) foi(ram) adicionada(s).')
-        messages.success(request, 'Chamado atualizado com sucesso!')
+        messages.success(request, 'Ticket atualizado com sucesso!')
         return redirect('ticket:ticket_detail', ticket_id=ticket.pk)
     
     context = {
         'form': form,
         'ticket': ticket,
+        'site_title': 'Edição de Ticket',
     }
     
     return render(request, 'ticket/create.html', context)
@@ -145,7 +147,7 @@ def update(request, ticket_id):
 def delete(request, ticket_id):
     ticket = get_object_or_404(Ticket, pk=ticket_id)
     if not (ticket.owner == request.user or request.user.is_staff):
-        messages.error(request, 'Não tem permissão para excluir este chamado.')
+        messages.error(request, 'Não tem permissão para excluir este ticket.')
         return redirect('ticket:index')
 
     if request.method == 'POST':
@@ -157,7 +159,7 @@ def delete(request, ticket_id):
                 description=f"Motivo: {reason}"
             )
             ticket.delete()
-            messages.success(request, 'Chamado excluído com sucesso.')
+            messages.success(request, 'Ticket excluído com sucesso.')
             return redirect('ticket:index')
         else:
             messages.error(request, 'O motivo da exclusão é obrigatório.')
