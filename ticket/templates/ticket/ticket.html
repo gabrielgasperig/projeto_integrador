@@ -62,10 +62,10 @@
         </div>
 
         <div class="flex flex-wrap items-center gap-2 mb-6">
-            {% if request.user == ticket.owner and ticket.status != 'Fechado' %}
+            {% if request.user.is_staff %}
                 <a href="{% url 'ticket:update' ticket.id %}" class="bg-indigo-500 text-white px-3 py-2 rounded-md hover:bg-indigo-600 text-sm font-semibold">Editar</a>
             {% endif %}
-            {% if request.user == ticket.owner or request.user.is_staff %}
+            {% if request.user.is_staff %}
                  <button @click="showDeleteModal = true" class="bg-red-500 text-white px-3 py-2 rounded-md hover:bg-red-600 text-sm font-semibold">Excluir</button>
             {% endif %}
             {% if request.user.is_staff and ticket.status != 'Fechado' and ticket.assigned_to %}
