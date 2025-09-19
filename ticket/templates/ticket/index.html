@@ -58,10 +58,10 @@
                             </td>
                             <td class="px-5 py-4 border-b border-gray-200 text-sm">
                                 <span class="px-2 py-1 rounded-md text-xs font-medium
-                                    {% if ticket.priority.name == 'Baixa' %} bg-indigo-100 text-indigo-800 {% endif %}
-                                    {% if ticket.priority.name == 'Media' %} bg-yellow-100 text-yellow-800 {% endif %}
-                                    {% if ticket.priority.name == 'Alta' %} bg-orange-100 text-orange-800 {% endif %}
-                                    {% if ticket.priority.name == 'Urgente' %} bg-red-100 text-red-800 {% endif %}
+                                    {% if ticket.priority == 'Baixa' %} bg-indigo-100 text-indigo-800 {% endif %}
+                                    {% if ticket.priority == 'Media' %} bg-yellow-100 text-yellow-800 {% endif %}
+                                    {% if ticket.priority == 'Alta' %} bg-orange-100 text-orange-800 {% endif %}
+                                    {% if ticket.priority == 'Urgente' %} bg-red-100 text-red-800 {% endif %}
                                 ">{{ ticket.priority }}</span>
                             </td>
                             <td class="px-5 py-4 border-b border-gray-200 text-sm">

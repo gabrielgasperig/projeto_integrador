@@ -124,21 +124,48 @@ def update(request, ticket_id):
     ticket = get_object_or_404(Ticket, pk=ticket_id, owner=request.user)
     form = TicketForm(request.POST or None, request.FILES or None, instance=ticket)
 
-    if form.is_valid():
+    if request.method == 'POST' and form.is_valid():
+        
+        if form.changed_data:
+            changes_list = []
+            for field_name in form.changed_data:
+                field_label = form.fields[field_name].label or field_name.capitalize()
+                changes_list.append(f"O campo '{field_label}' foi alterado.")
+            
+            description_of_changes = "\n".join(changes_list)
+
+            TicketEvent.objects.create(
+                ticket=ticket,
+                user=request.user,
+                event_type='EDIÇÃO',
+                description=description_of_changes
+            )
+        
         form.save()
 
         images = request.FILES.getlist('images')
         if images:
             for img in images:
                 TicketImage.objects.create(ticket=ticket, image=img)
-            messages.info(request, f'{len(images)} nova(s) imagem(ns) foi(ram) adicionada(s).')
-        messages.success(request, 'Ticket atualizado com sucesso!')
+            num_images = len(images)
+            if num_images == 1:
+                message_text = "1 nova imagem foi adicionada."
+            else:
+                message_text = f"{num_images} novas imagens foram adicionadas."
+            
+            messages.info(request, message_text)
+        
+        if form.changed_data or images:
+            messages.success(request, 'Ticket atualizado com sucesso!')
+        else:
+            messages.info(request, 'Nenhuma alteração foi feita.')
+
         return redirect('ticket:ticket_detail', ticket_id=ticket.pk)
     
     context = {
         'form': form,
         'ticket': ticket,
-        'site_title': 'Edição de Ticket',
+        'site_title': 'Edição de Chamado',
     }
     
     return render(request, 'ticket/create.html', context)
