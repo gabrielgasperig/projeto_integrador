@@ -5,39 +5,45 @@
 <div class="container mx-auto p-4 md:p-8" x-data="{ showConcludeModal: false, showDeleteModal: false, showTransferModal: false }">
     <div class="bg-white p-6 rounded-lg shadow-lg max-w-4xl mx-auto">
         
-        <div class="mb-6 border-b pb-4">
+       <div class="mb-6 border-b pb-4">
             <h1 class="text-3xl font-bold text-gray-900">{{ ticket.title }}</h1>
-            <div class="mt-4 flex flex-wrap items-center gap-x-6 gap-y-2 text-sm">
-                <span class="font-semibold flex items-center gap-2">Prioridade: 
-                    <span class="px-3 py-1 rounded-md font-medium
-                        {% if ticket.priority.name == 'Baixa' %} bg-indigo-100 text-indigo-800 {% endif %}
-                        {% if ticket.priority.name == 'Media' %} bg-yellow-100 text-yellow-800 {% endif %}
-                        {% if ticket.priority.name == 'Alta' %} bg-orange-100 text-orange-800 {% endif %}
-                        {% if ticket.priority.name == 'Urgente' %} bg-red-100 text-red-800 {% endif %}
-                    ">{{ ticket.priority.name|default:"Não definida" }}</span>
-                </span>
-                <span class="font-semibold flex items-center gap-2">
-                    Status: 
-                    <span class="px-3 py-1 rounded-md font-medium
-                        {% if ticket.status == 'Aberto' %} bg-blue-100 text-blue-800 {% endif %}
-                        {% if ticket.status == 'Em Andamento' %} bg-yellow-100 text-yellow-800 {% endif %}
-                        {% if ticket.status == 'Fechado' %} bg-green-100 text-green-800 {% endif %}
-                    ">{{ ticket.status }}</span>
-                </span>
-                <span class="font-semibold">Atribuído a: 
-                    <span class="font-normal">
-                        {% if ticket.assigned_to %}
-                            {{ ticket.assigned_to.get_full_name|default:ticket.assigned_to.username }}
-                        {% else %}
-                            Ninguém
-                            {% if request.user.is_staff and ticket.status == 'Aberto' %}
-                                <a href="{% url 'ticket:assign_ticket' ticket.id %}" class="ml-2 bg-indigo-500 text-white px-3 py-1 rounded-md hover:bg-indigo-600 text-xs font-bold transition-colors">
-                                    Capturar
-                                </a>
-                            {% endif %}
-                        {% endif %}
+            
+            <div class="mt-4 flex flex-wrap items-center justify-between gap-y-2 text-sm">
+                
+                <div class="flex flex-wrap items-center gap-x-6 gap-y-2">
+                    <span class="font-semibold flex items-center gap-2">
+                        Status: 
+                        <span class="px-3 py-1 rounded-md font-medium
+                            {% if ticket.status == 'Aberto' %} bg-blue-100 text-blue-800 {% endif %}
+                            {% if ticket.status == 'Em Andamento' %} bg-yellow-100 text-yellow-800 {% endif %}
+                            {% if ticket.status == 'Fechado' %} bg-green-100 text-green-800 {% endif %}
+                        ">{{ ticket.status }}</span>
                     </span>
-                </span>
+                    <span class="font-semibold flex items-center gap-2">Prioridade: 
+                        <span class="px-3 py-1 rounded-md font-medium
+                            {% if ticket.priority == 'Baixa' %} bg-blue-100 text-blue-800 {% endif %}
+                            {% if ticket.priority == 'Média' %} bg-yellow-100 text-yellow-800 {% endif %}
+                            {% if ticket.priority == 'Alta' %} bg-orange-100 text-orange-800 {% endif %}
+                            {% if ticket.priority == 'Urgente' %} bg-red-100 text-red-800 {% endif %}
+                        ">
+                            {{ ticket.get_priority_display }}
+                        </span>
+                    </span>
+                    <span class="font-semibold">
+                        Atribuído a: 
+                        <span class="font-normal">
+                            {{ ticket.assigned_to.get_full_name|default:"Ninguém" }}
+                        </span>
+                    </span>
+                </div>
+
+                <div>
+                    {% if not ticket.assigned_to and request.user.is_staff and ticket.status == 'Aberto' %}
+                        <a href="{% url 'ticket:assign_ticket' ticket.id %}" class="mt-2 bg-indigo-600 text-white px-4 py-2 rounded-md hover:bg-indigo-700 font-semibold transition-colors">
+                            Capturar
+                        </a>
+                    {% endif %}
+                </div>
             </div>
         </div>
         

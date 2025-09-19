@@ -11,11 +11,6 @@ class TicketAdmin(admin.ModelAdmin):
     list_editable = ('show', 'status')
     list_per_page = 20
 
-@admin.register(models.Priority)
-class PriorityAdmin(admin.ModelAdmin):
-    list_display = ('id', 'name')
-    search_fields = ('name',)
-
 @admin.register(models.TicketEvent)
 class TicketEventAdmin(admin.ModelAdmin):
     list_display = ('id', 'ticket', 'user', 'event_type', 'created_date')

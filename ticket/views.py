@@ -6,7 +6,7 @@ from django.core.paginator import Paginator
 from django.contrib.auth.forms import AuthenticationForm
 
 # Importações locais
-from .models import Ticket, Priority, TicketEvent, TicketImage
+from .models import Ticket, TicketEvent, TicketImage
 from .forms import (
     TicketForm, RegisterForm, RegisterUpdateForm, 
     ConcludeTicketForm, DeleteTicketForm, RatingForm, TransferTicketForm
@@ -36,7 +36,7 @@ def index(request):
         'page_obj': page_obj,
         'site_title': 'Fila de Atendimento',
         'status_choices': Ticket.STATUS_CHOICES,
-        'priorities': Priority.objects.all(),
+        'priorities': Ticket.PRIORITY_CHOICES,
     }
     return render(request, 'ticket/index.html', context)
 
