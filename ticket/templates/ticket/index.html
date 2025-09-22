@@ -1,36 +1,35 @@
 {% extends 'global/base.html' %}
+{% load widget_tweaks %}
 
 {% block content %}
-<div class="container mx-auto py-8 px-4">
+<div class="p-4 md:p-8">
     
     <div class="flex flex-col md:flex-row items-center justify-between mb-6 gap-4">
-        <h1 class="text-3xl font-bold text-gray-800">Fila de Atendimento</h1>
+        <h1 class="text-2xl md:text-3xl font-bold text-gray-800">Fila de Atendimento</h1>
 
         <form method="GET" class="flex flex-col sm:flex-row items-center gap-2">
-            <select name="status" class="bg-white border border-gray-300 rounded-md px-3 py-2 focus:outline-none focus:ring-2 focus:ring-indigo-500">
-                <option value="">Status</option>
+            <select name="status" class="bg-white border border-gray-300 rounded-md px-3 py-2 focus:outline-none focus:ring-2 focus:ring-blue-500">
+                <option value="">Todos os Status</option>
                 {% for value, display_name in status_choices %}
                     <option value="{{ value }}" {% if request.GET.status == value %}selected{% endif %}>
                         {{ display_name }}
                     </option>
                 {% endfor %}
             </select>
-
-            <select name="priority" class="bg-white border border-gray-300 rounded-md px-3 py-2 focus:outline-none focus:ring-2 focus:ring-indigo-500">
-                <option value="">Prioridade</option>
+            <select name="priority" class="bg-white border border-gray-300 rounded-md px-3 py-2 focus:outline-none focus:ring-2 focus:ring-blue-500">
+                <option value="">Todas as Prioridades</option>
                 {% for value, display_name in priorities %}
                     <option value="{{ value }}" {% if request.GET.priority == value %}selected{% endif %}>
                         {{ display_name }}
                     </option>
                 {% endfor %}
             </select>
-
-            <button type="submit" class="bg-indigo-600 text-white py-2 px-4 rounded-md hover:bg-indigo-700 transition-colors">Filtrar</button>
+            <button type="submit" class="bg-blue-600 text-white py-2 px-4 rounded-md hover:bg-blue-700 transition-colors">Filtrar</button>
             <a href="{% url 'ticket:index' %}" class="text-gray-600 hover:text-gray-800 ml-2">Limpar</a>
         </form>
 
-        <div class="flex">
-            <a href="{% url 'ticket:create' %}" class="bg-indigo-600 text-white py-2 px-4 rounded-md hover:bg-indigo-700 transition-colors">
+        <div class="flex-shrink-0">
+            <a href="{% url 'ticket:create' %}" class="bg-blue-600 text-white py-2 px-4 rounded-md hover:bg-blue-700 transition-colors">
                 + Criar Ticket
             </a>
         </div>
@@ -43,8 +42,8 @@
                     <tr>
                         <th class="px-5 py-3 border-b-2 border-gray-200 bg-gray-100 text-left text-xs font-semibold text-gray-600 uppercase tracking-wider">ID</th>
                         <th class="px-5 py-3 border-b-2 border-gray-200 bg-gray-100 text-left text-xs font-semibold text-gray-600 uppercase tracking-wider">Título</th>
-                        <th class="px-5 py-3 border-b-2 border-gray-200 bg-gray-100 text-left text-xs font-semibold text-gray-600 uppercase tracking-wider">Prioridade</th>
                         <th class="px-5 py-3 border-b-2 border-gray-200 bg-gray-100 text-left text-xs font-semibold text-gray-600 uppercase tracking-wider">Status</th>
+                        <th class="px-5 py-3 border-b-2 border-gray-200 bg-gray-100 text-left text-xs font-semibold text-gray-600 uppercase tracking-wider">Prioridade</th>
                         <th class="px-5 py-3 border-b-2 border-gray-200 bg-gray-100 text-left text-xs font-semibold text-gray-600 uppercase tracking-wider">Criado por</th>
                         <th class="px-5 py-3 border-b-2 border-gray-200 bg-gray-100 text-left text-xs font-semibold text-gray-600 uppercase tracking-wider">Data</th>
                     </tr>
@@ -54,22 +53,22 @@
                         <tr class="hover:bg-gray-50">
                             <td class="px-5 py-4 border-b border-gray-200 text-sm">{{ ticket.id }}</td>
                             <td class="px-5 py-4 border-b border-gray-200 text-sm">
-                                <a href="{% url 'ticket:ticket_detail' ticket.id %}" class="text-indigo-600 hover:text-indigo-900 font-semibold">{{ ticket.title }}</a>
+                                <a href="{% url 'ticket:ticket_detail' ticket.id %}" class="text-blue-600 hover:text-blue-900 font-semibold">{{ ticket.title }}</a>
                             </td>
                             <td class="px-5 py-4 border-b border-gray-200 text-sm">
                                 <span class="px-2 py-1 rounded-md text-xs font-medium
-                                    {% if ticket.priority == 'Baixa' %} bg-indigo-100 text-indigo-800 {% endif %}
-                                    {% if ticket.priority == 'Media' %} bg-yellow-100 text-yellow-800 {% endif %}
-                                    {% if ticket.priority == 'Alta' %} bg-orange-100 text-orange-800 {% endif %}
-                                    {% if ticket.priority == 'Urgente' %} bg-red-100 text-red-800 {% endif %}
-                                ">{{ ticket.priority }}</span>
-                            </td>
-                            <td class="px-5 py-4 border-b border-gray-200 text-sm">
-                                <span class="px-2 py-1 rounded-md text-xs font-medium
-                                    {% if ticket.status == 'Aberto' %} bg-indigo-100 text-indigo-800 {% endif %}
+                                    {% if ticket.status == 'Aberto' %} bg-blue-100 text-blue-800 {% endif %}
                                     {% if ticket.status == 'Em Andamento' %} bg-yellow-100 text-yellow-800 {% endif %}
                                     {% if ticket.status == 'Fechado' %} bg-green-100 text-green-800 {% endif %}
                                 ">{{ ticket.status }}</span>
+                            </td>
+                            <td class="px-5 py-4 border-b border-gray-200 text-sm">
+                                <span class="px-2 py-1 rounded-md text-xs font-medium
+                                    {% if ticket.priority == 'Baixa' %} bg-blue-100 text-blue-800 {% endif %}
+                                    {% if ticket.priority == 'Média' %} bg-yellow-100 text-yellow-800 {% endif %}
+                                    {% if ticket.priority == 'Alta' %} bg-orange-100 text-orange-800 {% endif %}
+                                    {% if ticket.priority == 'Urgente' %} bg-red-100 text-red-800 {% endif %}
+                                ">{{ ticket.priority }}</span>
                             </td>
                             <td class="px-5 py-4 border-b border-gray-200 text-sm">{{ ticket.owner.first_name }} {{ ticket.owner.last_name }}</td>
                             <td class="px-5 py-4 border-b border-gray-200 text-sm">{{ ticket.created_date|date:"d/m/Y H:i" }}</td>
@@ -83,4 +82,7 @@
             </table>
         </div>
     </div>
+    
+    {% include 'global/partials/_pagination.html' %}
+</div>
 {% endblock content %}

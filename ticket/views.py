@@ -25,7 +25,7 @@ def index(request):
         tickets_list = tickets_list.filter(status__iexact=status_filter)
     priority_filter = request.GET.get('priority', '')
     if priority_filter:
-        tickets_list = tickets_list.filter(priority__id=priority_filter)
+        tickets_list = tickets_list.filter(priority__iexact=priority_filter)
     tickets_list = tickets_list.order_by('-id')
 
     paginator = Paginator(tickets_list, 10)
@@ -308,11 +308,16 @@ def user_update(request):
 
 def login_view(request):
     form = AuthenticationForm(request, data=request.POST or None)
+    
+    if request.method == 'POST' and not form.is_valid():
+        messages.error(request, 'Usuário ou senha inválidos. Por favor, tente novamente.')
+
     if form.is_valid():
         user = form.get_user()
         auth.login(request, user)
-        messages.success(request, f'Bem vindo(a) {user.first_name}!')
+        messages.success(request, f'Bem-vindo(a) de volta, {user.first_name}!')
         return redirect('ticket:index')
+        
     context = {
         'form': form,
         'site_title': 'Login',

@@ -1,15 +1,17 @@
-<footer class="bg-gray-800 text-gray-400 shadow-inner mt-auto">
-    <div class="container mx-auto px-6 py-4 flex flex-col sm:flex-row items-center justify-between">
+<footer class="bg-gray-800 text-gray-400 border-t border-gray-700 h-20 flex items-center">
+    <div class="container mx-auto px-6 flex flex-col sm:flex-row items-center justify-between">
         
-        <!-- Copyright -->
-        <div class="text-center sm:text-left mb-4 sm:mb-0">
+        <div class="text-center sm:text-left">
             <p class="text-sm font-semibold">
                 &copy; {% now "Y" %} Gesticket
             </p>
             <p class="text-xs mt-1">
-                Projeto de Graduação Integrado.
+                Projeto de Graduação Integrado
             </p>
         </div>
 
+        <div class="hidden md:flex space-x-6">
+            <a href="#" class="text-sm hover:text-white transition-colors">Central de Privacidade</a>
+        </div>
     </div>
 </footer>
