@@ -249,7 +249,7 @@ def search(request):
         'site_title': f'Busca - "{search_value}"',
         'search_value': search_value,
         'status_choices': Ticket.STATUS_CHOICES,
-        'priorities': Priority.objects.all(),
+        'priorities': Ticket.PRIORITY_CHOICES,
     }
     return render(request, 'ticket/index.html', context)
 
