@@ -20,12 +20,26 @@ def index(request):
         tickets_list = Ticket.objects.all()
     else:
         tickets_list = Ticket.objects.filter(owner=request.user)
+
+    search_value = request.GET.get('q', '').strip()
     status_filter = request.GET.get('status', '')
+    priority_filter = request.GET.get('priority', '')
+
+    if search_value:
+        tickets_list = tickets_list.filter(
+            Q(title__icontains=search_value) | 
+            Q(description__icontains=search_value) | 
+            Q(owner__first_name__icontains=search_value) | 
+            Q(owner__last_name__icontains=search_value) |
+            Q(id__icontains=search_value)
+        )
+
     if status_filter:
         tickets_list = tickets_list.filter(status__iexact=status_filter)
-    priority_filter = request.GET.get('priority', '')
+    
     if priority_filter:
         tickets_list = tickets_list.filter(priority__iexact=priority_filter)
+    
     tickets_list = tickets_list.order_by('-id')
 
     paginator = Paginator(tickets_list, 10)
@@ -37,6 +51,7 @@ def index(request):
         'site_title': 'Fila de Atendimento',
         'status_choices': Ticket.STATUS_CHOICES,
         'priorities': Ticket.PRIORITY_CHOICES,
+        'search_value': search_value, 
     }
     return render(request, 'ticket/index.html', context)
 
@@ -228,30 +243,6 @@ def assign_ticket(request, ticket_id):
     TicketEvent.objects.create(ticket=ticket, user=request.user, event_type='STATUS', description=f"Ticket atribuído a {request.user.get_full_name()}. Status alterado para 'Em Andamento'.")
     messages.success(request, f'Você capturou o ticket #{ticket.id}.')
     return redirect('ticket:ticket_detail', ticket_id=ticket.id)
-
-def search(request):
-    search_value = request.GET.get('q', '').strip()
-    if not search_value:
-        return redirect('ticket:index')
-    tickets = Ticket.objects.filter(show=True).filter(
-        Q(title__icontains=search_value) | 
-        Q(description__icontains=search_value) | 
-        Q(owner__username__icontains=search_value) |
-        Q(owner__first_name__icontains=search_value) |
-        Q(owner__last_name__icontains=search_value) |
-        Q(id__icontains=search_value)
-    ).order_by('-id')
-    paginator = Paginator(tickets, 10)
-    page_number = request.GET.get('page')
-    page_obj = paginator.get_page(page_number)
-    context = {
-        'page_obj': page_obj,
-        'site_title': f'Busca - "{search_value}"',
-        'search_value': search_value,
-        'status_choices': Ticket.STATUS_CHOICES,
-        'priorities': Ticket.PRIORITY_CHOICES,
-    }
-    return render(request, 'ticket/index.html', context)
 
 @login_required(login_url='ticket:login')
 def transfer_ticket(request, ticket_id):

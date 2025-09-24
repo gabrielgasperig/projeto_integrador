@@ -6,7 +6,6 @@ app_name = 'ticket'
 urlpatterns = [
     # URLs principais da aplicação
     path('', views.index, name='index'),
-    path('search/', views.search, name='search'),
     
     # URLs para ações relacionadas a um Ticket específico
     path('ticket/create/', views.create, name='create'),
