@@ -52,7 +52,7 @@
                 </div>
                 <div>
                     <label for="{{ form.images.id_for_label }}" class="block text-sm font-medium text-gray-700">{{ form.images.label }}</label>
-                    {% render_field form.images class="mt-1 block w-full text-sm text-gray-500 file:mr-4 file:py-2 file:px-4 file:rounded-md file:border-0 file:text-sm file:font-semibold file:bg-blue-50 file:text-indigo-700 hover:file:bg-indigo-100" multiple=True %}
+                    {% render_field form.images class="mt-1 block w-full text-sm text-gray-500 file:mr-4 file:py-2 file:px-4 file:rounded-md file:border-0 file:text-sm file:font-semibold file:bg-blue-50 file:text-blue-700 hover:file:bg-blue-100" multiple=True %}
                     {% for error in form.images.errors %}
                         <p class="mt-1 text-xs text-red-600">{{ error }}</p>
                     {% endfor %}
@@ -61,7 +61,7 @@
 
             <div class="pt-6 flex items-center justify-end gap-3">
                 <a href="{{ request.META.HTTP_REFERER|default:'/' }}" class="bg-gray-200 text-gray-800 font-bold py-2 px-4 rounded-md hover:bg-gray-300 transition-colors">Cancelar</a>
-                <button type="submit" class="bg-indigo-600 text-white font-bold py-2 px-4 rounded-md hover:bg-indigo-700 transition-colors">
+                <button type="submit" class="bg-blue-600 text-white font-bold py-2 px-4 rounded-md hover:bg-blue-700 transition-colors">
                     {% if 'update' in request.path %}
                         Salvar Alterações
                     {% else %}

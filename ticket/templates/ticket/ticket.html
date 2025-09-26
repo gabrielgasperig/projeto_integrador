@@ -13,15 +13,15 @@
                 <div class="flex flex-wrap items-center gap-x-6 gap-y-2">
                     <span class="font-semibold flex items-center gap-2">
                         Status: 
-                        <span class="px-3 py-1 rounded-md font-medium
+                        <span class="px-2 py-1 rounded-md text-xs font-medium
                             {% if ticket.status == 'Aberto' %} bg-blue-100 text-blue-800 {% endif %}
                             {% if ticket.status == 'Em Andamento' %} bg-yellow-100 text-yellow-800 {% endif %}
                             {% if ticket.status == 'Fechado' %} bg-green-100 text-green-800 {% endif %}
                         ">{{ ticket.status }}</span>
                     </span>
                     <span class="font-semibold flex items-center gap-2">Prioridade: 
-                        <span class="px-3 py-1 rounded-md font-medium
-                            {% if ticket.priority == 'Baixa' %} bg-blue-100 text-blue-800 {% endif %}
+                        <span class="px-2 py-1 rounded-md text-xs font-medium
+                            {% if ticket.priority == 'Baixa' %} bg-gray-100 text-gray-800 {% endif %}
                             {% if ticket.priority == 'Média' %} bg-yellow-100 text-yellow-800 {% endif %}
                             {% if ticket.priority == 'Alta' %} bg-orange-100 text-orange-800 {% endif %}
                             {% if ticket.priority == 'Urgente' %} bg-red-100 text-red-800 {% endif %}
@@ -55,7 +55,7 @@
 
                 <div>
                     {% if not ticket.assigned_to and request.user.is_staff and ticket.status == 'Aberto' %}
-                        <a href="{% url 'ticket:assign_ticket' ticket.id %}" class="mt-2 bg-indigo-600 text-white px-4 py-2 rounded-md hover:bg-indigo-700 font-semibold transition-colors">
+                        <a href="{% url 'ticket:assign_ticket' ticket.id %}" class="mt-2 bg-blue-600 text-white px-4 py-2 rounded-md hover:bg-blue-700 font-semibold transition-colors">
                             Capturar
                         </a>
                     {% endif %}
@@ -143,7 +143,7 @@
                         placeholder="Digite o seu comentário aqui..."
                         required></textarea>
                         
-                <button type="submit" class="mt-2 bg-indigo-600 text-white px-4 py-2 rounded-md hover:bg-indigo-700 font-semibold transition-colors">
+                <button type="submit" class="mt-2 bg-blue-600 text-white px-4 py-2 rounded-md hover:bg-blue-700 font-semibold transition-colors">
                     Enviar Comentário
                 </button>
             </form>
@@ -174,7 +174,7 @@
                                     {% render_field rating_form.feedback class="mt-1 block w-full p-2 border border-gray-300 rounded-md shadow-sm" %}
                                 </div>
                             </div>
-                            <button type="submit" class="mt-4 bg-indigo-600 text-white px-4 py-2 rounded-md hover:bg-indigo-700">Enviar Avaliação</button>
+                            <button type="submit" class="mt-4 bg-blue-600 text-white px-4 py-2 rounded-md hover:bg-blue-700">Enviar Avaliação</button>
                         </form>
                     {% else %}
                         <p class="text-gray-600">Aguardando avaliação.</p>
