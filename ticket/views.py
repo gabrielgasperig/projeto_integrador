@@ -4,6 +4,8 @@ from django.contrib import messages, auth
 from django.db.models import Q
 from django.core.paginator import Paginator
 from django.contrib.auth.forms import AuthenticationForm
+from django.utils import timezone
+from datetime import timedelta
 
 # Importações locais
 from .models import Ticket, TicketEvent, TicketImage
@@ -110,6 +112,16 @@ def create(request):
     if request.method == 'POST' and form.is_valid():
         ticket = form.save(commit=False)
         ticket.owner = request.user
+
+        sla_times = {
+            'Baixa': timedelta(hours=72),
+            'Média': timedelta(hours=48),    
+            'Alta': timedelta(hours=24),     
+            'Urgente': timedelta(hours=8),     
+        }
+       
+        sla_duration = sla_times.get(ticket.priority, timedelta(hours=72)) 
+        ticket.sla_deadline = timezone.now() + sla_duration
         ticket.save()
 
         images = request.FILES.getlist('images')
@@ -220,6 +232,7 @@ def conclude_ticket(request, ticket_id):
         if form.is_valid():
             solution = form.cleaned_data['solution']
             ticket.status = 'Fechado'
+            ticket.closed_date = timezone.now() 
             ticket.save()
             TicketEvent.objects.create(
                 ticket=ticket, user=request.user, event_type='CONCLUSÃO', 

@@ -29,6 +29,22 @@
                             {{ ticket.get_priority_display }}
                         </span>
                     </span>
+                     {% if ticket.sla_deadline %}
+                    <span class="font-semibold flex items-center gap-2">
+                        Prazo SLA:
+                        <span class="font-normal">{{ ticket.sla_deadline|date:"d/m/Y H:i" }}</span>
+                        {% with sla_status=ticket.sla_status %}
+                            <span class="px-2 py-1 rounded-md text-xs font-medium
+                                {% if sla_status == 'No Prazo' %} bg-gray-100 text-gray-800 {% endif %}
+                                {% if sla_status == 'Atenção' %} bg-yellow-100 text-yellow-800 {% endif %}
+                                {% if sla_status == 'Violado' %} bg-red-100 text-red-800 {% endif %}
+                                {% if sla_status == 'Cumprido' %} bg-green-100 text-green-800 {% endif %}
+                            ">
+                                {{ sla_status }}
+                            </span>
+                        {% endwith %}
+                    </span>
+                    {% endif %}
                     <span class="font-semibold">
                         Atribuído a: 
                         <span class="font-normal">

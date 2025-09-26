@@ -48,6 +48,7 @@
                         <th class="px-5 py-3 border-b-2 border-gray-200 bg-gray-100 text-left text-xs font-semibold text-gray-600 uppercase tracking-wider">Título</th>
                         <th class="px-5 py-3 border-b-2 border-gray-200 bg-gray-100 text-left text-xs font-semibold text-gray-600 uppercase tracking-wider">Status</th>
                         <th class="px-5 py-3 border-b-2 border-gray-200 bg-gray-100 text-left text-xs font-semibold text-gray-600 uppercase tracking-wider">Prioridade</th>
+                        <th class="px-5 py-3 border-b-2 border-gray-200 bg-gray-100 text-left text-xs font-semibold text-gray-600 uppercase tracking-wider">SLA</th>
                         <th class="px-5 py-3 border-b-2 border-gray-200 bg-gray-100 text-left text-xs font-semibold text-gray-600 uppercase tracking-wider">Criado por</th>
                         <th class="px-5 py-3 border-b-2 border-gray-200 bg-gray-100 text-left text-xs font-semibold text-gray-600 uppercase tracking-wider">Data</th>
                     </tr>
@@ -74,12 +75,24 @@
                                     {% if ticket.priority == 'Urgente' %} bg-red-100 text-red-800 {% endif %}
                                 ">{{ ticket.priority }}</span>
                             </td>
+                            <td class="px-5 py-4 border-b border-gray-200 text-sm">
+                                {% with sla_status=ticket.sla_status %}
+                                    <span class="px-2 py-1 rounded-md text-xs font-medium
+                                        {% if sla_status == 'No Prazo' %} bg-gray-100 text-gray-800 {% endif %}
+                                        {% if sla_status == 'Atenção' %} bg-yellow-100 text-yellow-800 {% endif %}
+                                        {% if sla_status == 'Violado' %} bg-red-100 text-red-800 {% endif %}
+                                        {% if sla_status == 'Cumprido' %} bg-green-100 text-green-800 {% endif %}
+                                    ">
+                                        {{ sla_status }}
+                                    </span>
+                                {% endwith %}
+                            </td>
                             <td class="px-5 py-4 border-b border-gray-200 text-sm">{{ ticket.owner.first_name }} {{ ticket.owner.last_name }}</td>
                             <td class="px-5 py-4 border-b border-gray-200 text-sm">{{ ticket.created_date|date:"d/m/Y H:i" }}</td>
                         </tr>
                     {% empty %}
                         <tr>
-                            <td colspan="5" class="text-center py-10 text-gray-500">Nenhum ticket encontrado.</td>
+                            <td colspan="7" class="text-center py-10 text-gray-500">Nenhum ticket encontrado.</td>
                         </tr>
                     {% endfor %}
                 </tbody>
