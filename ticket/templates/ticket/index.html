@@ -44,22 +44,22 @@
             <table class="min-w-full leading-normal">
                 <thead>
                     <tr>
-                        <th class="px-5 py-3 border-b-2 border-gray-200 bg-gray-100 text-left text-xs font-semibold text-gray-600 uppercase tracking-wider">ID</th>
                         <th class="px-5 py-3 border-b-2 border-gray-200 bg-gray-100 text-left text-xs font-semibold text-gray-600 uppercase tracking-wider">Título</th>
+                        <th class="px-5 py-3 border-b-2 border-gray-200 bg-gray-100 text-left text-xs font-semibold text-gray-600 uppercase tracking-wider">Criado por</th>
+                        <th class="px-5 py-3 border-b-2 border-gray-200 bg-gray-100 text-left text-xs font-semibold text-gray-600 uppercase tracking-wider">Data</th>
                         <th class="px-5 py-3 border-b-2 border-gray-200 bg-gray-100 text-left text-xs font-semibold text-gray-600 uppercase tracking-wider">Status</th>
                         <th class="px-5 py-3 border-b-2 border-gray-200 bg-gray-100 text-left text-xs font-semibold text-gray-600 uppercase tracking-wider">Prioridade</th>
                         <th class="px-5 py-3 border-b-2 border-gray-200 bg-gray-100 text-left text-xs font-semibold text-gray-600 uppercase tracking-wider">SLA</th>
-                        <th class="px-5 py-3 border-b-2 border-gray-200 bg-gray-100 text-left text-xs font-semibold text-gray-600 uppercase tracking-wider">Criado por</th>
-                        <th class="px-5 py-3 border-b-2 border-gray-200 bg-gray-100 text-left text-xs font-semibold text-gray-600 uppercase tracking-wider">Data</th>
                     </tr>
                 </thead>
                 <tbody>
                     {% for ticket in page_obj %}
                         <tr class="hover:bg-gray-50">
-                            <td class="px-5 py-4 border-b border-gray-200 text-sm">{{ ticket.id }}</td>
                             <td class="px-5 py-4 border-b border-gray-200 text-sm">
                                 <a href="{% url 'ticket:ticket_detail' ticket.id %}" class="text-blue-600 hover:text-blue-900 font-semibold">{{ ticket.title }}</a>
                             </td>
+                            <td class="px-5 py-4 border-b border-gray-200 text-sm">{{ ticket.owner.first_name }} {{ ticket.owner.last_name }}</td>
+                            <td class="px-5 py-4 border-b border-gray-200 text-sm">{{ ticket.created_date|date:"d/m/Y H:i" }}</td>
                             <td class="px-5 py-4 border-b border-gray-200 text-sm">
                                 <span class="px-2 py-1 rounded-md text-xs font-medium
                                     {% if ticket.status == 'Aberto' %} bg-blue-100 text-blue-800 {% endif %}
@@ -87,8 +87,6 @@
                                     </span>
                                 {% endwith %}
                             </td>
-                            <td class="px-5 py-4 border-b border-gray-200 text-sm">{{ ticket.owner.first_name }} {{ ticket.owner.last_name }}</td>
-                            <td class="px-5 py-4 border-b border-gray-200 text-sm">{{ ticket.created_date|date:"d/m/Y H:i" }}</td>
                         </tr>
                     {% empty %}
                         <tr>

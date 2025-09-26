@@ -276,7 +276,7 @@ def transfer_ticket(request, ticket_id):
             ticket.save()
 
             TicketEvent.objects.create(
-                ticket=ticket, user=request.user, event_type='STATUS',
+                ticket=ticket, user=request.user, event_type='TRANSFERÊNCIA',
                 description=f"Ticket transferido de {old_admin_name} para {new_admin.get_full_name()}."
             )
             messages.success(request, f'Ticket transferido para {new_admin.get_full_name()}.')

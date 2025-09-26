@@ -82,6 +82,7 @@ class TicketEvent(models.Model):
         ('COMENTÁRIO', 'Comentário'),
         ('EDIÇÃO', 'Edição'),
         ('STATUS', 'Mudança de Status'),
+        ('TRANSFERÊNCIA', 'Transferência'),
         ('CONCLUSÃO', 'Conclusão'),
         ('EXCLUSÃO', 'Exclusão'),
         ('AVALIAÇÃO', 'Avaliação'),
