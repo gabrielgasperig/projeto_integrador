@@ -5,7 +5,7 @@ from django.db.models import Q
 from django.core.paginator import Paginator
 from django.contrib.auth.forms import AuthenticationForm
 from django.utils import timezone
-from datetime import timedelta
+from datetime import timedelta, datetime
 
 # Importações locais
 from .models import Ticket, TicketEvent, TicketImage
@@ -82,25 +82,45 @@ def my_tickets(request):
 
 
 @login_required(login_url='ticket:login')
-@user_passes_test(is_admin, login_url='ticket:index') # Protege a página, só admins podem aceder
+@user_passes_test(is_admin, login_url='ticket:index')
 def all_tickets(request):
     """
     Página para o admin ver todos os tickets do sistema, com filtros e paginação.
     """
     tickets_list = Ticket.objects.all()
 
+    # Captura os parâmetros de filtro da URL
     search_value = request.GET.get('q', '').strip()
     status_filter = request.GET.get('status', '')
     priority_filter = request.GET.get('priority', '')
+    start_date_str = request.GET.get('start_date', '')
+    end_date_str = request.GET.get('end_date', '')
 
+    # Aplica os filtros de texto e select
     if search_value:
-        tickets_list = tickets_list.filter(
-            Q(title__icontains=search_value) | Q(description__icontains=search_value)
-        )
+        tickets_list = tickets_list.filter(Q(title__icontains=search_value) | Q(description__icontains=search_value))
     if status_filter:
         tickets_list = tickets_list.filter(status__iexact=status_filter)
     if priority_filter:
         tickets_list = tickets_list.filter(priority__iexact=priority_filter)
+
+    if start_date_str:
+        try:
+            # Filtra a partir do início do dia selecionado
+            start_date = datetime.strptime(start_date_str, '%Y-%m-%d').date()
+            tickets_list = tickets_list.filter(created_date__gte=start_date)
+        except ValueError:
+            pass # Ignora data inválida
+    
+    if end_date_str:
+        try:
+            # Filtra até ao final do dia selecionado
+            end_date = datetime.strptime(end_date_str, '%Y-%m-%d').date()
+            end_date_inclusive = end_date + timedelta(days=1)
+            tickets_list = tickets_list.filter(created_date__lt=end_date_inclusive)
+        except ValueError:
+            pass # Ignora data inválida
+
 
     tickets_list = tickets_list.order_by('-id')
     
@@ -114,6 +134,8 @@ def all_tickets(request):
         'status_choices': Ticket.STATUS_CHOICES,
         'priorities': Ticket.PRIORITY_CHOICES,
         'search_value': search_value,
+        'start_date': start_date_str,
+        'end_date': end_date_str,
     }
     return render(request, 'ticket/all_tickets.html', context)
 
