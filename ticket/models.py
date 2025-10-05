@@ -1,7 +1,6 @@
 from django.db import models
 from django.conf import settings
 from django.utils import timezone
-from datetime import timedelta
 
 class Ticket(models.Model):
     
@@ -30,11 +29,11 @@ class Ticket(models.Model):
     closed_date = models.DateTimeField(null=True, blank=True, verbose_name="Data de Fechamento")
 
     RATING_CHOICES = [
-        (1, '⭐ Péssimo'),
-        (2, '⭐⭐ Ruim'),
-        (3, '⭐⭐⭐ Regular'),
-        (4, '⭐⭐⭐⭐ Bom'),
-        (5, '⭐⭐⭐⭐⭐ Ótimo'),
+        (1, '⭐'),
+        (2, '⭐⭐'),
+        (3, '⭐⭐⭐'),
+        (4, '⭐⭐⭐⭐'),
+        (5, '⭐⭐⭐⭐⭐'),
     ]
     rating = models.IntegerField(choices=RATING_CHOICES, null=True, blank=True, verbose_name="Avaliação")
     feedback = models.TextField(blank=True, null=True, verbose_name="Feedback do Utilizador")

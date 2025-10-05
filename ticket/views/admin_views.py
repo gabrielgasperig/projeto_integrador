@@ -67,7 +67,7 @@ def all_tickets(request):
     if start_date_str:
         try:
             # Filtra a partir do início do dia selecionado
-            start_date = datetime.strptime(start_date_str, '%Y-%m-%d').date()
+            start_date = datetime.strptime(start_date_str, '%d-%m-%Y').date()
             tickets_list = tickets_list.filter(created_date__gte=start_date)
         except ValueError:
             pass # Ignora data inválida
@@ -75,7 +75,7 @@ def all_tickets(request):
     if end_date_str:
         try:
             # Filtra até ao final do dia selecionado
-            end_date = datetime.strptime(end_date_str, '%Y-%m-%d').date()
+            end_date = datetime.strptime(end_date_str, '%d-%m-%Y').date()
             end_date_inclusive = end_date + timedelta(days=1)
             tickets_list = tickets_list.filter(created_date__lt=end_date_inclusive)
         except ValueError:
