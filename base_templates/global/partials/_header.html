@@ -29,14 +29,14 @@
                 </a>
                 <div class="absolute right-0 mt-2 bg-white text-black shadow-lg rounded-lg w-40 p-2 z-20" x-show="open" x-transition style="display: none;">
                     <ul class="[&>li>a]:p-2 [&>li>a]:rounded [&>li>a]:block [&>li:hover]:bg-gray-100">
-                        <li><a href="{% url "ticket:user_update" %}">Perfil</a></li>
-                        <li><a href="{% url "ticket:logout" %}">Sair</a></li>
+                        <li><a href="{% url "account:user_update" %}">Perfil</a></li>
+                        <li><a href="{% url "account:logout" %}">Sair</a></li>
                     </ul>
                 </div>
             </li>
             {% else %}
-            <li><a href="{% url "ticket:login" %}" class="p-2 rounded-lg hover:bg-gray-700">Entrar</a></li>
-            <li><a href="{% url "ticket:register" %}" class="p-2 rounded-lg hover:bg-gray-700">Registar</a></li>
+            <li><a href="{% url "account:login" %}" class="p-2 rounded-lg hover:bg-gray-700">Entrar</a></li>
+            <li><a href="{% url "account:register" %}" class="p-2 rounded-lg hover:bg-gray-700">Registar</a></li>
             {% endif %}
         </ul>
     </nav>

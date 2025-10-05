@@ -40,8 +40,9 @@ INSTALLED_APPS = [
     'django.contrib.staticfiles',
 
     'ticket',
+    'account',
 
-    'widget_tweaks'
+    'widget_tweaks',
 ]
 
 MIDDLEWARE = [

@@ -1,0 +1,25 @@
+{% extends 'global/base.html' %}
+
+{% block content %}
+<div class="p-4 md:p-8">
+    <div class="flex flex-col items-center justify-center text-center bg-white p-12 rounded-lg shadow-md">
+        
+        <!-- Ícone visual -->
+        <svg class="w-16 h-16 text-blue-300 mb-4" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 19v-6a2 2 0 00-2-2H5a2 2 0 00-2 2v6a2 2 0 002 2h2a2 2 0 002-2zm0 0V9a2 2 0 012-2h2a2 2 0 012 2v10m-6 0a2 2 0 002 2h2a2 2 0 002-2m0 0V5a2 2 0 012-2h2a2 2 0 012 2v14a2 2 0 01-2 2h-2a2 2 0 01-2-2z" />
+        </svg>
+
+        <h1 class="text-3xl font-bold text-gray-800">Página de Relatórios</h1>
+        
+        <p class="mt-2 text-gray-600 max-w-lg">
+            Esta secção está em desenvolvimento. No futuro, aqui poderá gerar relatórios detalhados sobre o desempenho do suporte, tempos de resolução, avaliações dos utilizadores e muito mais.
+        </p>
+
+        <div class="mt-6">
+            <a href="{% url 'ticket:index' %}" class="text-blue-600 hover:text-blue-800 font-semibold">
+                &larr; Voltar para a Fila de Atendimento
+            </a>
+        </div>
+    </div>
+</div>
+{% endblock content %}

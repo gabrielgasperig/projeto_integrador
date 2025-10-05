@@ -1,57 +1,16 @@
 from django.shortcuts import render, get_object_or_404, redirect
-from django.contrib.auth.decorators import login_required, user_passes_test
-from django.contrib import messages, auth
-from django.db.models import Q
-from django.core.paginator import Paginator
-from django.contrib.auth.forms import AuthenticationForm
+from django.contrib.auth.decorators import login_required
+from django.contrib import messages
 from django.utils import timezone
-from datetime import timedelta, datetime
+from datetime import timedelta
 
 # Importações locais
-from .models import Ticket, TicketEvent, TicketImage
-from .forms import (
-    TicketForm, RegisterForm, RegisterUpdateForm, 
-    ConcludeTicketForm, DeleteTicketForm, RatingForm, TransferTicketForm
+from ..models import Ticket, TicketEvent, TicketImage
+from ..forms import (
+    TicketForm, ConcludeTicketForm, DeleteTicketForm, RatingForm, TransferTicketForm
 )
 
-# --- VIEWS DE TICKETS ---
-
-def is_admin(user):
-    return user.is_staff
-
-@login_required(login_url='ticket:login')
-def index(request):
-    """
-    Página principal da aplicação.
-    - Para Admins: Mostra a "Fila de Atendimento".
-    - Para Users Padrão: Redireciona para "Meus Tickets".
-    """
-    if not request.user.is_staff:
-        # Se não for admin, o "início" é a página "Meus Tickets"
-        return redirect('ticket:my_tickets')
-    
-    # Table 1: Tickets na fila, abertos e sem ninguém responsável
-    unassigned_tickets = Ticket.objects.filter(
-        status__in=['Aberto', 'Em Andamento'], 
-        assigned_to=None
-    ).order_by('-created_date') # Do mais novo para o mais antigo
-
-    # Table 2: Tickets que estão sob a responsabilidade do admin logado
-    assigned_to_me = Ticket.objects.filter(
-        assigned_to=request.user
-    ).exclude(
-        status='Fechado'
-    ).order_by('sla_deadline') # Os com SLA mais próximo primeiro
-
-    context = {
-        'site_title': 'Fila de Atendimento',
-        'unassigned_tickets': unassigned_tickets,
-        'assigned_to_me': assigned_to_me,
-    }
-    return render(request, 'ticket/index.html', context)
-
-
-@login_required(login_url='ticket:login')
+@login_required(login_url='account:login')
 def my_tickets(request):
     """
     Página para o user padrão ver e gerir os seus próprios tickets.
@@ -81,65 +40,9 @@ def my_tickets(request):
     return render(request, 'ticket/my_tickets.html', context)
 
 
-@login_required(login_url='ticket:login')
-@user_passes_test(is_admin, login_url='ticket:index')
-def all_tickets(request):
-    """
-    Página para o admin ver todos os tickets do sistema, com filtros e paginação.
-    """
-    tickets_list = Ticket.objects.all()
-
-    # Captura os parâmetros de filtro da URL
-    search_value = request.GET.get('q', '').strip()
-    status_filter = request.GET.get('status', '')
-    priority_filter = request.GET.get('priority', '')
-    start_date_str = request.GET.get('start_date', '')
-    end_date_str = request.GET.get('end_date', '')
-
-    # Aplica os filtros de texto e select
-    if search_value:
-        tickets_list = tickets_list.filter(Q(title__icontains=search_value) | Q(description__icontains=search_value))
-    if status_filter:
-        tickets_list = tickets_list.filter(status__iexact=status_filter)
-    if priority_filter:
-        tickets_list = tickets_list.filter(priority__iexact=priority_filter)
-
-    if start_date_str:
-        try:
-            # Filtra a partir do início do dia selecionado
-            start_date = datetime.strptime(start_date_str, '%Y-%m-%d').date()
-            tickets_list = tickets_list.filter(created_date__gte=start_date)
-        except ValueError:
-            pass # Ignora data inválida
-    
-    if end_date_str:
-        try:
-            # Filtra até ao final do dia selecionado
-            end_date = datetime.strptime(end_date_str, '%Y-%m-%d').date()
-            end_date_inclusive = end_date + timedelta(days=1)
-            tickets_list = tickets_list.filter(created_date__lt=end_date_inclusive)
-        except ValueError:
-            pass # Ignora data inválida
 
 
-    tickets_list = tickets_list.order_by('-id')
-    
-    paginator = Paginator(tickets_list, 10)
-    page_number = request.GET.get('page')
-    page_obj = paginator.get_page(page_number)
-
-    context = {
-        'site_title': 'Todos os Tickets',
-        'page_obj': page_obj,
-        'status_choices': Ticket.STATUS_CHOICES,
-        'priorities': Ticket.PRIORITY_CHOICES,
-        'search_value': search_value,
-        'start_date': start_date_str,
-        'end_date': end_date_str,
-    }
-    return render(request, 'ticket/all_tickets.html', context)
-
-@login_required(login_url='ticket:login')
+@login_required(login_url='account:login')
 def ticket_detail(request, ticket_id):
     ticket = get_object_or_404(Ticket, pk=ticket_id)
     is_owner = ticket.owner == request.user
@@ -187,7 +90,7 @@ def ticket_detail(request, ticket_id):
     }
     return render(request, 'ticket/ticket.html', context)
 
-@login_required(login_url='ticket:login')
+@login_required(login_url='account:login')
 def create(request):
     form = TicketForm(request.POST or None, request.FILES or None)
 
@@ -228,7 +131,7 @@ def create(request):
     return render(request, 'ticket/create.html', context)
 
 
-@login_required(login_url='ticket:login')
+@login_required(login_url='account:login')
 def update(request, ticket_id):
     ticket = get_object_or_404(Ticket, pk=ticket_id, owner=request.user)
     form = TicketForm(request.POST or None, request.FILES or None, instance=ticket)
@@ -279,7 +182,7 @@ def update(request, ticket_id):
     
     return render(request, 'ticket/create.html', context)
 
-@login_required(login_url='ticket:login')
+@login_required(login_url='account:login')
 def delete(request, ticket_id):
     ticket = get_object_or_404(Ticket, pk=ticket_id)
     if not (ticket.owner == request.user or request.user.is_staff):
@@ -302,7 +205,7 @@ def delete(request, ticket_id):
             return redirect('ticket:ticket_detail', ticket_id=ticket.id)
 
 
-@login_required(login_url='ticket:login')
+@login_required(login_url='account:login')
 def conclude_ticket(request, ticket_id):
     ticket = get_object_or_404(Ticket, pk=ticket_id)
     if not request.user.is_staff:
@@ -326,7 +229,7 @@ def conclude_ticket(request, ticket_id):
     
     return redirect('ticket:ticket_detail', ticket_id=ticket.id)
 
-@login_required(login_url='ticket:login')
+@login_required(login_url='account:login')
 def assign_ticket(request, ticket_id):
     if not request.user.is_staff:
         messages.error(request, 'Ação não permitida.')
@@ -339,7 +242,7 @@ def assign_ticket(request, ticket_id):
     messages.success(request, 'Você capturou o ticket.')
     return redirect('ticket:ticket_detail', ticket_id=ticket.id)
 
-@login_required(login_url='ticket:login')
+@login_required(login_url='account:login')
 def transfer_ticket(request, ticket_id):
     ticket = get_object_or_404(Ticket, pk=ticket_id)
     
@@ -364,54 +267,3 @@ def transfer_ticket(request, ticket_id):
             messages.success(request, f'Ticket transferido para {new_admin.get_full_name()}.')
     
     return redirect('ticket:ticket_detail', ticket_id=ticket.id)
-
-# --- VIEWS DE AUTENTICAÇÃO ---
-
-def register_view(request):
-    form = RegisterForm(request.POST or None)
-    if form.is_valid():
-        form.save()
-        messages.success(request, 'Conta criada com sucesso! Por favor, faça o login.')
-        return redirect('ticket:login')
-    context = {
-        'form': form,
-        'site_title': 'Cadastro',
-    }
-    return render(request, 'ticket/register.html', context)
-
-@login_required(login_url='ticket:login')
-def user_update(request):
-    form = RegisterUpdateForm(request.POST or None, instance=request.user)
-    if form.is_valid():
-        form.save()
-        messages.success(request, 'Dados atualizados com sucesso!')
-        return redirect('ticket:user_update')
-    context = {
-        'form': form,
-        'site_title': 'Meu Perfil'
-    }
-    return render(request, 'ticket/user_update.html', context)
-
-def login_view(request):
-    form = AuthenticationForm(request, data=request.POST or None)
-    
-    if request.method == 'POST' and not form.is_valid():
-        messages.error(request, 'Usuário ou senha inválidos. Por favor, tente novamente.')
-
-    if form.is_valid():
-        user = form.get_user()
-        auth.login(request, user)
-        messages.success(request, f'Bem-vindo(a) de volta, {user.first_name}!')
-        return redirect('ticket:index')
-        
-    context = {
-        'form': form,
-        'site_title': 'Login',
-    }
-    return render(request, 'ticket/login.html', context)
-
-@login_required(login_url='ticket:login')
-def logout_view(request):
-    auth.logout(request)
-    messages.success(request, 'Você saiu da sua conta.')
-    return redirect('ticket:login')

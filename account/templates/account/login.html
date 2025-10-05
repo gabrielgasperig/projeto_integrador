@@ -16,7 +16,7 @@
             </p>
         </div>
 
-        <form class="space-y-6" method="POST" action="{% url 'ticket:login' %}">
+        <form class="space-y-6" method="POST" action="{% url 'account:login' %}">
             {% csrf_token %}
 
             <div>
@@ -49,7 +49,7 @@
 
         <p class="text-sm text-center text-gray-600">
             Não tem uma conta?
-            <a href="{% url 'ticket:register' %}" class="font-medium text-blue-600 hover:text-blue-500">
+            <a href="{% url 'account:register' %}" class="font-medium text-blue-600 hover:text-blue-500">
                 Cadastre-se
             </a>
         </p>
