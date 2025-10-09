@@ -28,9 +28,7 @@ DEBUG = True
 
 ALLOWED_HOSTS = []
 
-
 # Application definition
-
 INSTALLED_APPS = [
     'django.contrib.admin',
     'django.contrib.auth',
@@ -146,3 +144,8 @@ MESSAGE_TAGS = {
     messages.WARNING: 'yellow',
     messages.ERROR: 'red',
 }
+
+try:
+    from .local_settings import *
+except ImportError:
+    ...
