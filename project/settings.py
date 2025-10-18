@@ -39,7 +39,7 @@ INSTALLED_APPS = [
 
     'ticket',
     'account',
-    'report',
+    'statistician',
 
     'widget_tweaks',
 ]

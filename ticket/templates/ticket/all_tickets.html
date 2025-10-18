@@ -4,12 +4,15 @@
 {% block content %}
 <div class="p-4 md:p-8">
     
-    <div class="flex flex-col md:flex-row items-center justify-between mb-6 gap-4">
+    <div class="mb-6">
         <h1 class="text-2xl md:text-3xl font-bold text-gray-800">Todos os Tickets</h1>
+    </div>
+
+    <div class="flex flex-col md:flex-row items-center justify-between mb-6 gap-4">
         
         <!-- Formulário de Filtro e Busca -->
-       <form action="{% url 'ticket:all_tickets' %}" method="GET" class="flex flex-col sm:flex-row items-end gap-3 mb-6">
-            <input type="search" placeholder="Buscar..." class="bg-white border border-gray-300 rounded-md px-3 py-2 focus:outline-none focus:ring-2 focus:ring-blue-500 w-full sm:w-auto" id="search" name="q" value="{{ search_value }}">
+       <form action="{% url 'ticket:all_tickets' %}" method="GET" class="flex flex-col sm:flex-row items-end gap-3 mb-6 w-full">
+            <input type="search" placeholder="Buscar..." class="bg-white border border-gray-300 rounded-md px-3 py-2 focus:outline-none focus:ring-2 focus:ring-blue-500 w-full sm:flex-auto" id="search" name="q" value="{{ search_value }}">
             
             <select name="status" class="bg-white border border-gray-300 rounded-md px-3 py-2 focus:outline-none focus:ring-2 focus:ring-blue-500 w-full sm:w-auto">
                 <option value="">Todos os Status</option>
@@ -42,12 +45,6 @@
             <a href="{% url 'ticket:all_tickets' %}" class="bg-gray-200 text-gray-600 py-2 px-4 rounded-md hover:bg-gray-300 transition-colors whitespace-nowrap w-full sm:w-auto text-center font-semibold">Limpar</a>
 
         </form>
-
-        <div class="flex-shrink-0">
-            <a href="{% url 'ticket:create' %}" class="bg-blue-600 text-white py-2 px-4 rounded-md hover:bg-blue-700 transition-colors font-semibold">
-                + Criar Ticket
-            </a>
-        </div>
         
     </div>
 
