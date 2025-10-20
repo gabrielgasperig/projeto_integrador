@@ -27,6 +27,7 @@ urlpatterns = [
     path('', include('ticket.urls')),
     path('account/', include('account.urls')),
     path('statistician/', include('statistician.urls')),
+    path('inventory/', include('inventory.urls')),
 
 
 ]

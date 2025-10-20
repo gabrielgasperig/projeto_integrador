@@ -1,0 +1,125 @@
+{% extends 'global/base.html' %}
+
+{% block content %}
+<div class="p-4 md:p-8">
+    <div class="flex justify-between items-center mb-6">
+        <h1 class="text-3xl font-bold text-gray-800">Inventário de Ativos de TI</h1>
+        <div x-data="{ open: false }" class="relative">
+            <button @click="open = !open" class="bg-blue-500 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded inline-flex items-center">
+                <span>Adicionar Ativo</span>
+                <svg class="fill-current h-4 w-4 ml-2" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 20"><path d="M9.293 12.95l.707.707L15.657 8l-1.414-1.414L10 10.828 5.757 6.586 4.343 8z"/></svg>
+            </button>
+            <div x-show="open" @click.away="open = false" class="absolute right-0 mt-2 w-48 bg-white rounded-md shadow-lg z-20">
+                <a href="{% url 'inventory:create_asset' 'hardware' %}" class="block px-4 py-2 text-sm text-gray-700 hover:bg-gray-100">Hardware</a>
+                <a href="{% url 'inventory:create_asset' 'software' %}" class="block px-4 py-2 text-sm text-gray-700 hover:bg-gray-100">Software</a>
+                <a href="{% url 'inventory:create_asset' 'subscription' %}" class="block px-4 py-2 text-sm text-gray-700 hover:bg-gray-100">Assinatura</a>
+            </div>
+        </div>
+    </div>
+
+    <!-- Tabela de Hardware -->
+    <div class="bg-white p-6 rounded-lg shadow-md mb-8">
+        <h2 class="text-xl font-semibold text-gray-700 mb-4">Hardwares</h2>
+        <div class="overflow-x-auto">
+            <table class="min-w-full bg-white">
+                <thead class="bg-gray-100">
+                    <tr>
+                        <th class="py-2 px-4 border-b">Nome</th>
+                        <th class="py-2 px-4 border-b">Modelo</th>
+                        <th class="py-2 px-4 border-b">Fabricante</th>
+                        <th class="py-2 px-4 border-b">Número de Série</th>
+                        <th class="py-2 px-4 border-b">Atribuído a</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    {% for hardware in hardwares %}
+                        <tr class="hover:bg-gray-50">
+                            <td class="py-2 px-4 border-b">{{ hardware.name }}</td>
+                            <td class="py-2 px-4 border-b">{{ hardware.model|default:"-" }}</td>
+                            <td class="py-2 px-4 border-b">{{ hardware.manufacturer|default:"-" }}</td>
+                            <td class="py-2 px-4 border-b">{{ hardware.serial_number }}</td>
+                            <td class="py-2 px-4 border-b">{{ hardware.assigned_to.username|default:"-" }}</td>
+                        </tr>
+                    {% empty %}
+                        <tr>
+                            <td colspan="5" class="py-4 px-4 text-center text-gray-500">Nenhum hardware encontrado.</td>
+                        </tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+        </div>
+    </div>
+
+    <!-- Tabela de Software -->
+    <div class="bg-white p-6 rounded-lg shadow-md mb-8">
+        <h2 class="text-xl font-semibold text-gray-700 mb-4">Softwares</h2>
+        <div class="overflow-x-auto">
+            <table class="min-w-full bg-white">
+                <thead class="bg-gray-100">
+                    <tr>
+                        <th class="py-2 px-4 border-b">Nome</th>
+                        <th class="py-2 px-4 border-b">Versão</th>
+                        <th class="py-2 px-4 border-b">Chave de Licença</th>
+                        <th class="py-2 px-4 border-b">Data de Expiração</th>
+                        <th class="py-2 px-4 border-b">Atribuído a</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    {% for software in softwares %}
+                        <tr class="hover:bg-gray-50">
+                            <td class="py-2 px-4 border-b">{{ software.name }}</td>
+                            <td class="py-2 px-4 border-b">{{ software.version|default:"-" }}</td>
+                            <td class="py-2 px-4 border-b">{{ software.license_key }}</td>
+                            <td class="py-2 px-4 border-b">{{ software.expiration_date|date:"d/m/Y"|default:"-" }}</td>
+                            <td class="py-2 px-4 border-b">{{ software.assigned_to.username|default:"-" }}</td>
+                        </tr>
+                    {% empty %}
+                        <tr>
+                            <td colspan="5" class="py-4 px-4 text-center text-gray-500">Nenhum software encontrado.</td>
+                        </tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+        </div>
+    </div>
+
+    <!-- Tabela de Assinaturas -->
+    <div class="bg-white p-6 rounded-lg shadow-md">
+        <h2 class="text-xl font-semibold text-gray-700 mb-4">Assinaturas</h2>
+        <div class="overflow-x-auto">
+            <table class="min-w-full bg-white">
+                <thead class="bg-gray-100">
+                    <tr>
+                        <th class="py-2 px-4 border-b">Nome</th>
+                        <th class="py-2 px-4 border-b">Data de Início</th>
+                        <th class="py-2 px-4 border-b">Data de Fim</th>
+                        <th class="py-2 px-4 border-b">Custo de Renovação</th>
+                        <th class="py-2 px-4 border-b">Atribuído a</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    {% for subscription in subscriptions %}
+                        <tr class="hover:bg-gray-50">
+                            <td class="py-2 px-4 border-b">{{ subscription.name }}</td>
+                            <td class="py-2 px-4 border-b">{{ subscription.start_date|date:"d/m/Y" }}</td>
+                            <td class="py-2 px-4 border-b">{{ subscription.end_date|date:"d/m/Y" }}</td>
+                            <td class="py-2 px-4 border-b">R$ {{ subscription.renewal_cost|default:"-" }}</td>
+                            <td class="py-2 px-4 border-b">{{ subscription.assigned_to.username|default:"-" }}</td>
+                        </tr>
+                    {% empty %}
+                        <tr>
+                            <td colspan="5" class="py-4 px-4 text-center text-gray-500">Nenhuma assinatura encontrada.</td>
+                        </tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+        </div>
+    </div>
+
+    <div class="mt-8">
+        <a href="{% url 'ticket:index' %}" class="text-blue-600 hover:text-blue-800 font-semibold">
+            &larr; Voltar para a Fila de Atendimento
+        </a>
+    </div>
+</div>
+{% endblock content %}

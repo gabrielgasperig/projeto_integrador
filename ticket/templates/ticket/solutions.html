@@ -1,0 +1,46 @@
+{% extends 'global/base.html' %}
+
+{% block content %}
+<div class="p-4 md:p-8">
+    <div class="mb-6">
+        <h1 class="text-2xl md:text-3xl font-bold text-gray-800">Banco de Soluções</h1>
+        <p class="text-gray-600 mt-2">Aqui você encontra todos os tickets que já foram resolvidos, com suas respectivas soluções.</p>
+    </div>
+
+    <div class="space-y-6">
+        {% for ticket in page_obj %}
+            <div class="bg-white shadow-md rounded-lg p-6">
+                <h2 class="text-xl font-bold text-gray-800 mb-2">
+                    <a href="{% url 'ticket:ticket_detail' ticket.id %}" class="text-blue-600 hover:text-blue-900">
+                        {{ ticket.title }}
+                    </a>
+                </h2>
+                <p class="text-gray-600 mb-4">{{ ticket.description|truncatewords:50 }}</p>
+                
+                {% with conclusion=ticket.conclusion_events.0 %}
+                    {% if conclusion %}
+                        <div class="bg-gray-50 p-4 rounded-md">
+                            <h3 class="font-semibold text-gray-700 mb-2">Solução Aplicada</h3>
+                            <p class="text-gray-600">{{ conclusion.description }}</p>
+                        </div>
+                    {% else %}
+                        <div class="bg-yellow-50 p-4 rounded-md">
+                            <p class="text-yellow-700">Ainda não há uma solução registrada para este ticket.</p>
+                        </div>
+                    {% endif %}
+                {% endwith %}
+
+                <div class="mt-4 text-sm text-gray-500">
+                    <span>Resolvido em: {{ ticket.closed_date|date:"d/m/Y H:i" }}</span>
+                </div>
+            </div>
+        {% empty %}
+            <div class="text-center py-10 text-gray-500">
+                <p>Nenhum ticket resolvido encontrado.</p>
+            </div>
+        {% endfor %}
+    </div>
+
+    {% include 'global/partials/_pagination.html' %}
+</div>
+{% endblock content %}

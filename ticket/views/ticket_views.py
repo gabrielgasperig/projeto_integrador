@@ -3,6 +3,8 @@ from django.contrib.auth.decorators import login_required
 from django.contrib import messages
 from django.utils import timezone
 from datetime import timedelta
+from django.db import models
+from django.core.paginator import Paginator
 
 # Importações locais
 from ..models import Ticket, TicketEvent, TicketImage
@@ -267,3 +269,22 @@ def transfer_ticket(request, ticket_id):
             messages.success(request, f'Ticket transferido para {new_admin.get_full_name()}.')
     
     return redirect('ticket:ticket_detail', ticket_id=ticket.id)
+
+@login_required(login_url='account:login')
+def solutions(request):
+    """
+    Página para exibir um banco de soluções de tickets fechados.
+    """
+    resolved_tickets_list = Ticket.objects.filter(status='Fechado').prefetch_related(
+        models.Prefetch('events', queryset=TicketEvent.objects.filter(event_type='CONCLUSÃO'), to_attr='conclusion_events')
+    ).order_by('-closed_date')
+
+    paginator = Paginator(resolved_tickets_list, 10)  # 10 tickets per page
+    page_number = request.GET.get('page')
+    page_obj = paginator.get_page(page_number)
+
+    context = {
+        'site_title': 'Banco de Soluções',
+        'page_obj': page_obj,
+    }
+    return render(request, 'ticket/solutions.html', context)

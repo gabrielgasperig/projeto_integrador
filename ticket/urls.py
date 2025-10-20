@@ -10,6 +10,7 @@ urlpatterns = [
     # URLs TICKET
     path('meus-tickets/', ticket_views.my_tickets, name='my_tickets'),
     path('todos-tickets/', admin_views.all_tickets, name='all_tickets'),
+    path('solutions/', ticket_views.solutions, name='solutions'),
     path('ticket/create/', ticket_views.create, name='create'),
     path('ticket/<int:ticket_id>/', ticket_views.ticket_detail, name='ticket_detail'),
     path('ticket/<int:ticket_id>/update/', ticket_views.update, name='update'),
