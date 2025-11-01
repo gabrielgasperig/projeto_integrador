@@ -65,7 +65,7 @@ class RegisterUpdateForm(forms.ModelForm):
         password = cleaned_data.get('password')
         password2 = cleaned_data.get('password2')
         if password and password != password2:
-            self.add_error('password2', ValidationError('As senhas não batem.'))
+            self.add_error('password2', ValidationError('As senhas não conferem.'))
         return cleaned_data
     def clean_email(self):
         email = self.cleaned_data.get('email')

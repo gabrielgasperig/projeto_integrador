@@ -42,5 +42,6 @@ def index(request):
         'sla_compliance_percentage': sla_compliance_percentage,
         'average_rating': average_rating,
         'tickets_per_agent': tickets_per_agent,
+        'site_title':'Estatísticas de Tickets',
     }
     return render(request, 'statistician/index.html', context)

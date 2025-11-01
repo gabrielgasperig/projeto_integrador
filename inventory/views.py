@@ -11,6 +11,7 @@ def index(request):
         'hardwares': hardwares,
         'softwares': softwares,
         'subscriptions': subscriptions,
+        'site_title':'Inventário de Ativos',
     }
     return render(request, 'inventory/index.html', context)
 
