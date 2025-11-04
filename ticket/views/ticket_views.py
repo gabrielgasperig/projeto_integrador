@@ -111,10 +111,6 @@ def ticket_detail(request, ticket_id):
 
 @login_required(login_url='account:login')
 def create(request):
-    # Verifica se o usuário é staff
-    if request.user.is_staff:
-        messages.error(request, 'Administradores devem criar tickets pela fila de atendimento.')
-        return redirect('ticket:index')
 
     form = TicketForm(request.POST or None, request.FILES or None)
 
@@ -302,16 +298,14 @@ def solutions(request):
         messages.error(request, 'Acesso negado. Você não tem permissão para acessar esta página.')
         return redirect('ticket:my_tickets')
     query = request.GET.get('q', '')
-    priority = request.GET.get('priority', '')
     start_date = request.GET.get('start_date', '')
     end_date = request.GET.get('end_date', '')
+    sort = request.GET.get('sort', '-closed_date')
 
-    # Base query
     resolved_tickets_list = Ticket.objects.filter(status='Fechado').prefetch_related(
         Prefetch('events', queryset=TicketEvent.objects.filter(event_type='CONCLUSÃO'), to_attr='conclusion_events')
     )
 
-    # Filtering
     if query:
         resolved_tickets_list = resolved_tickets_list.filter(
             Q(title__icontains=query) |
@@ -319,18 +313,19 @@ def solutions(request):
             Q(events__description__icontains=query)
         ).distinct()
 
-    if priority:
-        resolved_tickets_list = resolved_tickets_list.filter(priority=priority)
-
     if start_date:
         resolved_tickets_list = resolved_tickets_list.filter(closed_date__gte=start_date)
-    
+
     if end_date:
-        # Adiciona 1 dia ao end_date para incluir todos os tickets do dia
         end_date_dt = datetime.strptime(end_date, '%Y-%m-%d') + timedelta(days=1)
         resolved_tickets_list = resolved_tickets_list.filter(closed_date__lt=end_date_dt)
 
-    resolved_tickets_list = resolved_tickets_list.order_by('-closed_date')
+    # Ordenação dinâmica
+    allowed_sorts = ['title', '-title', 'closed_date', '-closed_date']
+    if sort in allowed_sorts:
+        resolved_tickets_list = resolved_tickets_list.order_by(sort)
+    else:
+        resolved_tickets_list = resolved_tickets_list.order_by('-closed_date')
 
     paginator = Paginator(resolved_tickets_list, 10)
     page_number = request.GET.get('page')
@@ -339,10 +334,9 @@ def solutions(request):
     context = {
         'site_title': 'Banco de Soluções',
         'page_obj': page_obj,
-        'priorities': Ticket.PRIORITY_CHOICES,
         'search_value': query,
-        'priority_value': priority,
         'start_date': start_date,
         'end_date': end_date,
+        'current_sort': sort,
     }
     return render(request, 'ticket/solutions.html', context)

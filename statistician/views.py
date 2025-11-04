@@ -1,7 +1,7 @@
 from django.shortcuts import render
 from django.contrib.auth.decorators import login_required
 from ticket.models import Ticket
-from django.db.models import Count, Avg, F
+from django.db.models import Count, Avg, F, ExpressionWrapper, DurationField
 from django.utils import timezone
 
 @login_required
@@ -15,9 +15,15 @@ def index(request):
     tickets_by_priority = Ticket.objects.values('priority').annotate(count=Count('priority'))
 
     # Tempo Médio de Resolução
-    avg_resolution_time = Ticket.objects.filter(status='Fechado', closed_date__isnull=False).aggregate(
-        avg_time=Avg(F('closed_date') - F('created_date'))
-    )['avg_time']
+    avg_resolution = Ticket.objects.filter(status='Fechado', closed_date__isnull=False).annotate(
+        resolution_time=ExpressionWrapper(F('closed_date') - F('created_date'), output_field=DurationField())
+    ).aggregate(avg_time=Avg('resolution_time'))['avg_time']
+
+    # Converte para horas (float) se existir
+    if avg_resolution:
+        avg_resolution_time = avg_resolution.total_seconds() / 3600
+    else:
+        avg_resolution_time = None
 
     # Conformidade com o SLA
     sla_compliance = Ticket.objects.filter(status='Fechado', closed_date__isnull=False, sla_deadline__isnull=False)
@@ -29,7 +35,9 @@ def index(request):
     average_rating = Ticket.objects.filter(rating__isnull=False).aggregate(avg_rating=Avg('rating'))['avg_rating']
 
     # Tickets por Agente
-    tickets_per_agent = Ticket.objects.filter(assigned_to__isnull=False).values('assigned_to__username').annotate(count=Count('id'))
+    tickets_per_agent = Ticket.objects.filter(assigned_to__isnull=False).values(
+        'assigned_to__first_name', 'assigned_to__last_name'
+    ).annotate(count=Count('id'))
 
     context = {
         'total_tickets': total_tickets,

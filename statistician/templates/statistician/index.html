@@ -135,7 +135,7 @@
         <div class="space-y-4">
             {% for item in tickets_per_agent %}
             <div class="flex items-center">
-                <span class="w-40 text-sm text-gray-600">{{ item.assigned_to__username }}</span>
+                <span class="w-40 text-sm text-gray-600">{{ item.assigned_to__first_name }} {{ item.assigned_to__last_name }}</span>
                 <div class="flex-1 bg-gray-200 rounded-full h-6">
                     <div class="bg-teal-500 h-6 rounded-full text-white text-xs flex items-center justify-center" style="width: {% widthratio item.count total_tickets 100 %}%;">
                         {{ item.count }}

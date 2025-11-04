@@ -1,10 +1,15 @@
-<aside 
+<!-- Overlay escuro para mobile -->
+<template x-if="isMobileMenuOpen">
+    <div @click="isMobileMenuOpen = false" class="fixed inset-0 bg-black bg-opacity-50 z-20 md:hidden"></div>
+</template>
+<aside
     class="flex-shrink-0 bg-gray-800 text-gray-300 md:flex md:flex-col transition-all duration-300 ease-in-out"
     :class="{
-        'w-64': isSidebarOpen, 
-        'w-20': !isSidebarOpen,
-        'fixed inset-y-0 z-30 md:relative': isMobileMenuOpen,
-        'hidden md:flex': !isMobileMenuOpen
+        'w-64': isSidebarOpen,
+        'w-20': !isSidebarOpen && !isMobileMenuOpen,
+        'fixed inset-y-0 left-0 z-30 w-full max-w-xs': isMobileMenuOpen,
+        'hidden md:flex': !isMobileMenuOpen && !isSidebarOpen,
+        'md:relative': !isMobileMenuOpen
     }"
 >
     <!-- CABEÇALHO DO MENU COM BOTÃO DE RECOLHER -->
@@ -45,7 +50,7 @@
                 <svg class="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 19v-6a2 2 0 00-2-2H5a2 2 0 00-2 2v6a2 2 0 002 2h2a2 2 0 002-2zm0 0V9a2 2 0 012-2h2a2 2 0 012 2v10m-6 0a2 2 0 002 2h2a2 2 0 002-2m0 0V5a2 2 0 012-2h2a2 2 0 012 2v14a2 2 0 01-2 2h-2a2 2 0 01-2-2z" /></svg>
                 <span class="ml-4" x-show="isSidebarOpen || isMobileMenuOpen">Estatísticas</span>
             </a>
-            <a href="{% url 'inventory:asset_list' %}" class="flex items-center p-3 rounded-lg hover:bg-gray-700">
+            <a href="{% url 'inventory:index' %}" class="flex items-center p-3 rounded-lg hover:bg-gray-700">
                 <svg class="w-6 h-6" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                     <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 8h14M5 8a2 2 0 110-4h14a2 2 0 110 4M5 8v10a2 2 0 002 2h10a2 2 0 002-2V8m-9 4h4" />
                 </svg>

@@ -1,44 +1,65 @@
-{% extends 'global/base.html' %}
 
+{% extends 'global/base.html' %}
 {% block content %}
 <div class="p-4 md:p-8">
     <div class="mb-6">
         <h1 class="text-2xl md:text-3xl font-bold text-gray-800">Banco de Soluções</h1>
-        <p class="text-gray-600 mt-2">Aqui você encontra todos os tickets que já foram resolvidos, com suas respectivas soluções.</p>
+        <p class="text-gray-600 mt-2">Consulte soluções já aplicadas em tickets resolvidos para facilitar o atendimento.</p>
     </div>
 
-    <div class="space-y-6">
-        {% for ticket in page_obj %}
-            <div class="bg-white shadow-md rounded-lg p-6">
-                <h2 class="text-xl font-bold text-gray-800 mb-2">
-                    <a href="{% url 'ticket:ticket_detail' ticket.id %}" class="text-blue-600 hover:text-blue-900">
-                        {{ ticket.title }}
-                    </a>
-                </h2>
-                <p class="text-gray-600 mb-4">{{ ticket.description|truncatewords:50 }}</p>
-                
-                {% with conclusion=ticket.conclusion_events.0 %}
-                    {% if conclusion %}
-                        <div class="bg-gray-50 p-4 rounded-md">
-                            <h3 class="font-semibold text-gray-700 mb-2">Solução Aplicada</h3>
-                            <p class="text-gray-600">{{ conclusion.description }}</p>
-                        </div>
-                    {% else %}
-                        <div class="bg-yellow-50 p-4 rounded-md">
-                            <p class="text-yellow-700">Ainda não há uma solução registrada para este ticket.</p>
-                        </div>
-                    {% endif %}
-                {% endwith %}
+    <form action="" method="GET" class="flex flex-col sm:flex-row items-end gap-3 mb-6 w-full">
+        <input type="search" placeholder="Buscar solução..." class="bg-white border border-gray-300 rounded-md px-3 py-2 focus:outline-none focus:ring-2 focus:ring-blue-500 w-full sm:flex-auto" id="search" name="q" value="{{ search_value }}">
+        <div class="w-full">
+            <label for="start_date" class="text-xs text-gray-500">De:</label>
+            <input type="date" name="start_date" id="start_date" value="{{ start_date }}" class="bg-white border border-gray-300 rounded-md px-3 py-1.5 focus:outline-none focus:ring-2 focus:ring-blue-500 w-full">
+        </div>
+        <div class="w-full">
+            <label for="end_date" class="text-xs text-gray-500">Até:</label>
+            <input type="date" name="end_date" id="end_date" value="{{ end_date }}" class="bg-white border border-gray-300 rounded-md px-3 py-1.5 focus:outline-none focus:ring-2 focus:ring-blue-500 w-full">
+        </div>
+        <button type="submit" class="bg-blue-600 text-white py-2 px-4 rounded-md hover:bg-blue-700 transition-colors w-full sm:w-auto font-semibold">Filtrar</button>
+        <a href="" class="bg-gray-200 text-gray-600 py-2 px-4 rounded-md hover:bg-gray-300 transition-colors whitespace-nowrap w-full sm:w-auto text-center font-semibold">Limpar</a>
+    </form>
 
-                <div class="mt-4 text-sm text-gray-500">
-                    <span>Resolvido em: {{ ticket.closed_date|date:"d/m/Y H:i" }}</span>
-                </div>
-            </div>
-        {% empty %}
-            <div class="text-center py-10 text-gray-500">
-                <p>Nenhum ticket resolvido encontrado.</p>
-            </div>
-        {% endfor %}
+    <div class="bg-white shadow-md rounded-lg overflow-hidden">
+        <div class="overflow-x-auto">
+            <table class="min-w-full leading-normal">
+                <thead>
+                    <tr>
+                        <th class="px-5 py-3 border-b-2 border-gray-200 bg-gray-100 text-left text-xs font-semibold text-gray-600 uppercase tracking-wider">
+                            <a href="?sort={% if request.GET.sort == 'title' %}-title{% else %}title{% endif %}&q={{ search_value }}&start_date={{ start_date }}&end_date={{ end_date }}" class="hover:text-gray-900">Título</a>
+                        </th>
+                        <th class="px-5 py-3 border-b-2 border-gray-200 bg-gray-100 text-left text-xs font-semibold text-gray-600 uppercase tracking-wider">
+                            <a href="?sort={% if request.GET.sort == '-closed_date' %}closed_date{% else %}-closed_date{% endif %}&q={{ search_value }}&start_date={{ start_date }}&end_date={{ end_date }}" class="hover:text-gray-900">Data de Resolução</a>
+                        </th>
+                        <th class="px-5 py-3 border-b-2 border-gray-200 bg-gray-100 text-left text-xs font-semibold text-gray-600 uppercase tracking-wider">Solução Aplicada</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    {% for ticket in page_obj %}
+                        <tr class="hover:bg-gray-50">
+                            <td class="px-5 py-4 border-b border-gray-200 text-sm">
+                                <a href="{% url 'ticket:ticket_detail' ticket.id %}" class="text-blue-600 hover:text-blue-900 font-semibold">{{ ticket.title }}</a>
+                            </td>
+                            <td class="px-5 py-4 border-b border-gray-200 text-sm">{{ ticket.closed_date|date:"d/m/Y H:i" }}</td>
+                            <td class="px-5 py-4 border-b border-gray-200 text-sm">
+                                {% with conclusion=ticket.conclusion_events.0 %}
+                                    {% if conclusion %}
+                                        <span class="block text-gray-700">{{ conclusion.description }}</span>
+                                    {% else %}
+                                        <span class="block text-yellow-700">Ainda não há uma solução registrada para este ticket.</span>
+                                    {% endif %}
+                                {% endwith %}
+                            </td>
+                        </tr>
+                    {% empty %}
+                        <tr>
+                            <td colspan="3" class="text-center py-10 text-gray-500">Nenhuma solução encontrada.</td>
+                        </tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+        </div>
     </div>
 
     {% include 'global/partials/_pagination.html' %}
