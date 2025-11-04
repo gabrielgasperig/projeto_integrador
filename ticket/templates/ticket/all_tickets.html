@@ -54,12 +54,24 @@
              <table class="min-w-full leading-normal">
                     <thead>
                         <tr>
-                            <th class="px-5 py-3 border-b-2 border-gray-200 bg-gray-100 text-left text-xs font-semibold text-gray-600 uppercase tracking-wider">Título</th>
-                            <th class="px-5 py-3 border-b-2 border-gray-200 bg-gray-100 text-left text-xs font-semibold text-gray-600 uppercase tracking-wider">Criado por</th>
-                            <th class="px-5 py-3 border-b-2 border-gray-200 bg-gray-100 text-left text-xs font-semibold text-gray-600 uppercase tracking-wider">Data de criação</th>
-                            <th class="px-5 py-3 border-b-2 border-gray-200 bg-gray-100 text-left text-xs font-semibold text-gray-600 uppercase tracking-wider">Status</th>
-                            <th class="px-5 py-3 border-b-2 border-gray-200 bg-gray-100 text-left text-xs font-semibold text-gray-600 uppercase tracking-wider">Prioridade</th>
-                            <th class="px-5 py-3 border-b-2 border-gray-200 bg-gray-100 text-left text-xs font-semibold text-gray-600 uppercase tracking-wider">SLA</th>
+                            <th class="px-5 py-3 border-b-2 border-gray-200 bg-gray-100 text-left text-xs font-semibold text-gray-600 uppercase tracking-wider">
+                                <a href="?sort={% if current_sort == 'title' %}-title{% else %}title{% endif %}&q={{ search_value }}&status={{ request.GET.status }}&priority={{ request.GET.priority }}&start_date={{ start_date }}&end_date={{ end_date }}" class="hover:text-gray-900">Título</a>
+                            </th>
+                            <th class="px-5 py-3 border-b-2 border-gray-200 bg-gray-100 text-left text-xs font-semibold text-gray-600 uppercase tracking-wider">
+                                <a href="?sort={% if current_sort == 'owner' %}-owner{% else %}owner{% endif %}&q={{ search_value }}&status={{ request.GET.status }}&priority={{ request.GET.priority }}&start_date={{ start_date }}&end_date={{ end_date }}" class="hover:text-gray-900">Criado por</a>
+                            </th>
+                            <th class="px-5 py-3 border-b-2 border-gray-200 bg-gray-100 text-left text-xs font-semibold text-gray-600 uppercase tracking-wider">
+                                <a href="?sort={% if current_sort == '-created_date' %}created_date{% else %}-created_date{% endif %}&q={{ search_value }}&status={{ request.GET.status }}&priority={{ request.GET.priority }}&start_date={{ start_date }}&end_date={{ end_date }}" class="hover:text-gray-900">Data de criação</a>
+                            </th>
+                            <th class="px-5 py-3 border-b-2 border-gray-200 bg-gray-100 text-left text-xs font-semibold text-gray-600 uppercase tracking-wider">
+                                <a href="?sort={% if current_sort == 'status' %}-status{% else %}status{% endif %}&q={{ search_value }}&status={{ request.GET.status }}&priority={{ request.GET.priority }}&start_date={{ start_date }}&end_date={{ end_date }}" class="hover:text-gray-900">Status</a>
+                            </th>
+                            <th class="px-5 py-3 border-b-2 border-gray-200 bg-gray-100 text-left text-xs font-semibold text-gray-600 uppercase tracking-wider">
+                                <a href="?sort={% if current_sort == 'priority' %}-priority{% else %}priority{% endif %}&q={{ search_value }}&status={{ request.GET.status }}&priority={{ request.GET.priority }}&start_date={{ start_date }}&end_date={{ end_date }}" class="hover:text-gray-900">Prioridade</a>
+                            </th>
+                            <th class="px-5 py-3 border-b-2 border-gray-200 bg-gray-100 text-left text-xs font-semibold text-gray-600 uppercase tracking-wider">
+                                <a href="?sort={% if current_sort == 'sla_deadline' %}-sla_deadline{% else %}sla_deadline{% endif %}&q={{ search_value }}&status={{ request.GET.status }}&priority={{ request.GET.priority }}&start_date={{ start_date }}&end_date={{ end_date }}" class="hover:text-gray-900">SLA</a>
+                            </th>
                         </tr>
                     </thead>
                     <tbody>

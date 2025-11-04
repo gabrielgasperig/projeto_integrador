@@ -15,12 +15,24 @@
                  <table class="min-w-full leading-normal">
                     <thead>
                         <tr>
-                            <th class="px-5 py-3 border-b-2 border-gray-200 bg-gray-100 text-left text-xs font-semibold text-gray-600 uppercase tracking-wider">Título</th>
-                            <th class="px-5 py-3 border-b-2 border-gray-200 bg-gray-100 text-left text-xs font-semibold text-gray-600 uppercase tracking-wider">Criado por</th>
-                            <th class="px-5 py-3 border-b-2 border-gray-200 bg-gray-100 text-left text-xs font-semibold text-gray-600 uppercase tracking-wider">Data</th>
-                            <th class="px-5 py-3 border-b-2 border-gray-200 bg-gray-100 text-left text-xs font-semibold text-gray-600 uppercase tracking-wider">Status</th>
-                            <th class="px-5 py-3 border-b-2 border-gray-200 bg-gray-100 text-left text-xs font-semibold text-gray-600 uppercase tracking-wider">Prioridade</th>
-                            <th class="px-5 py-3 border-b-2 border-gray-200 bg-gray-100 text-left text-xs font-semibold text-gray-600 uppercase tracking-wider">SLA</th>
+                            <th class="px-5 py-3 border-b-2 border-gray-200 bg-gray-100 text-left text-xs font-semibold text-gray-600 uppercase tracking-wider">
+                                <a href="?sort_unassigned={% if current_sort_unassigned == 'title' %}-title{% else %}title{% endif %}" class="hover:text-gray-900">Título</a>
+                            </th>
+                            <th class="px-5 py-3 border-b-2 border-gray-200 bg-gray-100 text-left text-xs font-semibold text-gray-600 uppercase tracking-wider">
+                                <a href="?sort_unassigned={% if current_sort_unassigned == 'owner' %}-owner{% else %}owner{% endif %}" class="hover:text-gray-900">Criado por</a>
+                            </th>
+                            <th class="px-5 py-3 border-b-2 border-gray-200 bg-gray-100 text-left text-xs font-semibold text-gray-600 uppercase tracking-wider">
+                                <a href="?sort_unassigned={% if current_sort_unassigned == '-created_date' %}created_date{% else %}-created_date{% endif %}" class="hover:text-gray-900">Data</a>
+                            </th>
+                            <th class="px-5 py-3 border-b-2 border-gray-200 bg-gray-100 text-left text-xs font-semibold text-gray-600 uppercase tracking-wider">
+                                <a href="?sort_unassigned={% if current_sort_unassigned == 'status' %}-status{% else %}status{% endif %}" class="hover:text-gray-900">Status</a>
+                            </th>
+                            <th class="px-5 py-3 border-b-2 border-gray-200 bg-gray-100 text-left text-xs font-semibold text-gray-600 uppercase tracking-wider">
+                                <a href="?sort_unassigned={% if current_sort_unassigned == 'priority' %}-priority{% else %}priority{% endif %}" class="hover:text-gray-900">Prioridade</a>
+                            </th>
+                            <th class="px-5 py-3 border-b-2 border-gray-200 bg-gray-100 text-left text-xs font-semibold text-gray-600 uppercase tracking-wider">
+                                <a href="?sort_unassigned={% if current_sort_unassigned == 'sla_deadline' %}-sla_deadline{% else %}sla_deadline{% endif %}" class="hover:text-gray-900">SLA</a>
+                            </th>
                         </tr>
                     </thead>
                     <tbody>
@@ -81,12 +93,24 @@
                 <table class="min-w-full leading-normal">
                     <thead>
                         <tr>
-                            <th class="px-5 py-3 border-b-2 border-gray-200 bg-gray-100 text-left text-xs font-semibold text-gray-600 uppercase tracking-wider">Título</th>
-                            <th class="px-5 py-3 border-b-2 border-gray-200 bg-gray-100 text-left text-xs font-semibold text-gray-600 uppercase tracking-wider">Criado por</th>
-                            <th class="px-5 py-3 border-b-2 border-gray-200 bg-gray-100 text-left text-xs font-semibold text-gray-600 uppercase tracking-wider">Data de criação</th>
-                            <th class="px-5 py-3 border-b-2 border-gray-200 bg-gray-100 text-left text-xs font-semibold text-gray-600 uppercase tracking-wider">Status</th>
-                            <th class="px-5 py-3 border-b-2 border-gray-200 bg-gray-100 text-left text-xs font-semibold text-gray-600 uppercase tracking-wider">Prioridade</th>
-                            <th class="px-5 py-3 border-b-2 border-gray-200 bg-gray-100 text-left text-xs font-semibold text-gray-600 uppercase tracking-wider">SLA</th>
+                            <th class="px-5 py-3 border-b-2 border-gray-200 bg-gray-100 text-left text-xs font-semibold text-gray-600 uppercase tracking-wider">
+                                <a href="?sort_assigned={% if current_sort_assigned == 'title' %}-title{% else %}title{% endif %}" class="hover:text-gray-900">Título</a>
+                            </th>
+                            <th class="px-5 py-3 border-b-2 border-gray-200 bg-gray-100 text-left text-xs font-semibold text-gray-600 uppercase tracking-wider">
+                                <a href="?sort_assigned={% if current_sort_assigned == 'owner' %}-owner{% else %}owner{% endif %}" class="hover:text-gray-900">Criado por</a>
+                            </th>
+                            <th class="px-5 py-3 border-b-2 border-gray-200 bg-gray-100 text-left text-xs font-semibold text-gray-600 uppercase tracking-wider">
+                                <a href="?sort_assigned={% if current_sort_assigned == '-created_date' %}created_date{% else %}-created_date{% endif %}" class="hover:text-gray-900">Data de criação</a>
+                            </th>
+                            <th class="px-5 py-3 border-b-2 border-gray-200 bg-gray-100 text-left text-xs font-semibold text-gray-600 uppercase tracking-wider">
+                                <a href="?sort_assigned={% if current_sort_assigned == 'status' %}-status{% else %}status{% endif %}" class="hover:text-gray-900">Status</a>
+                            </th>
+                            <th class="px-5 py-3 border-b-2 border-gray-200 bg-gray-100 text-left text-xs font-semibold text-gray-600 uppercase tracking-wider">
+                                <a href="?sort_assigned={% if current_sort_assigned == 'priority' %}-priority{% else %}priority{% endif %}" class="hover:text-gray-900">Prioridade</a>
+                            </th>
+                            <th class="px-5 py-3 border-b-2 border-gray-200 bg-gray-100 text-left text-xs font-semibold text-gray-600 uppercase tracking-wider">
+                                <a href="?sort_assigned={% if current_sort_assigned == 'sla_deadline' %}-sla_deadline{% else %}sla_deadline{% endif %}" class="hover:text-gray-900">SLA</a>
+                            </th>
                         </tr>
                     </thead>
                     <tbody>
@@ -127,7 +151,7 @@
                             </tr>
                         {% empty %}
                             <tr>
-                                <td colspan="7" class="text-center py-10 text-gray-500">Nenhum ticket encontrado.</td>
+                                <td colspan="7" class="text-center py-10 text-gray-500">Nenhum ticket atribuído a você.</td>
                             </tr>
                         {% endfor %}
                     </tbody>
@@ -136,5 +160,4 @@
         </div>
     </div>
 </div>
-{% endblock %}
-
+{% endblock content %}

@@ -18,26 +18,27 @@ def index(request):
     - Para Users Padrão: Redireciona para "Meus Tickets".
     """
     if not request.user.is_staff:
-        # Se não for admin, o "início" é a página "Meus Tickets"
         return redirect('ticket:my_tickets')
-    
-    # Table 1: Tickets na fila, abertos e sem ninguém responsável
-    unassigned_tickets = Ticket.objects.filter(
-        status__in=['Aberto', 'Em Andamento'], 
-        assigned_to=None
-    ).order_by('-created_date') # Do mais novo para o mais antigo
 
-    # Table 2: Tickets que estão sob a responsabilidade do admin logado
+    sort_by_unassigned = request.GET.get('sort_unassigned', '-created_date')
+    unassigned_tickets = Ticket.objects.filter(
+        status__in=['Aberto', 'Em Andamento'],
+        assigned_to=None
+    ).order_by(sort_by_unassigned)
+
+    sort_by_assigned = request.GET.get('sort_assigned', 'sla_deadline')
     assigned_to_me = Ticket.objects.filter(
         assigned_to=request.user
     ).exclude(
         status='Fechado'
-    ).order_by('sla_deadline') # Os com SLA mais próximo primeiro
+    ).order_by(sort_by_assigned)
 
     context = {
         'site_title': 'Fila de Atendimento',
         'unassigned_tickets': unassigned_tickets,
         'assigned_to_me': assigned_to_me,
+        'current_sort_unassigned': sort_by_unassigned,
+        'current_sort_assigned': sort_by_assigned,
     }
     return render(request, 'ticket/index.html', context)
 
@@ -49,14 +50,13 @@ def all_tickets(request):
     """
     tickets_list = Ticket.objects.all()
 
-    # Captura os parâmetros de filtro da URL
     search_value = request.GET.get('q', '').strip()
     status_filter = request.GET.get('status', '')
     priority_filter = request.GET.get('priority', '')
     start_date_str = request.GET.get('start_date', '')
     end_date_str = request.GET.get('end_date', '')
+    sort_by = request.GET.get('sort', '-id')
 
-    # Aplica os filtros de texto e select
     if search_value:
         tickets_list = tickets_list.filter(Q(title__icontains=search_value) | Q(description__icontains=search_value))
     if status_filter:
@@ -66,23 +66,20 @@ def all_tickets(request):
 
     if start_date_str:
         try:
-            # Filtra a partir do início do dia selecionado
             start_date = datetime.strptime(start_date_str, '%d-%m-%Y').date()
             tickets_list = tickets_list.filter(created_date__gte=start_date)
         except ValueError:
-            pass # Ignora data inválida
+            pass
     
     if end_date_str:
         try:
-            # Filtra até ao final do dia selecionado
             end_date = datetime.strptime(end_date_str, '%d-%m-%Y').date()
             end_date_inclusive = end_date + timedelta(days=1)
             tickets_list = tickets_list.filter(created_date__lt=end_date_inclusive)
         except ValueError:
-            pass # Ignora data inválida
+            pass
 
-
-    tickets_list = tickets_list.order_by('-id')
+    tickets_list = tickets_list.order_by(sort_by)
     
     paginator = Paginator(tickets_list, 10)
     page_number = request.GET.get('page')
@@ -96,5 +93,6 @@ def all_tickets(request):
         'search_value': search_value,
         'start_date': start_date_str,
         'end_date': end_date_str,
+        'current_sort': sort_by,
     }
     return render(request, 'ticket/all_tickets.html', context)

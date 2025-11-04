@@ -2,8 +2,11 @@ from django.shortcuts import render, get_object_or_404, redirect
 from django.contrib.auth.decorators import login_required
 from django.contrib import messages
 from django.utils import timezone
-from datetime import timedelta
-from django.db import models
+from datetime import timedelta, datetime
+import re
+from django.contrib.auth.models import User
+
+from django.db.models import Q, Prefetch
 from django.core.paginator import Paginator
 
 # Importações locais
@@ -14,30 +17,29 @@ from ..forms import (
 
 @login_required(login_url='account:login')
 def my_tickets(request):
-    """
-    Página para o user padrão ver e gerir os seus próprios tickets.
-    """
+   
     if request.user.is_staff:
-        # Se um admin aceder a esta página por engano, redireciona para o início dele
         return redirect('ticket:index')
 
-    # Table 1: Tickets abertos ou em andamento criados pelo user
+    sort_by = request.GET.get('sort', '-created_date')
     open_tickets = Ticket.objects.filter(
         owner=request.user
     ).exclude(
         status='Fechado'
-    ).order_by('-created_date')
-    
-    # Table 2: Tickets fechados criados pelo user
+    ).order_by(sort_by)
+
+    closed_sort_by = request.GET.get('sort_closed', '-closed_date')
     closed_tickets = Ticket.objects.filter(
-        owner=request.user, 
+        owner=request.user,
         status='Fechado'
-    ).order_by('-closed_date')
+    ).order_by(closed_sort_by)
 
     context = {
         'site_title': 'Meus Tickets',
         'open_tickets': open_tickets,
         'closed_tickets': closed_tickets,
+        'current_sort': sort_by,
+        'current_sort_closed': closed_sort_by,
     }
     return render(request, 'ticket/my_tickets.html', context)
 
@@ -65,6 +67,21 @@ def ticket_detail(request, ticket_id):
                     ticket=ticket, user=request.user, event_type='COMENTÁRIO', 
                     description=comment_text
                 )
+
+                # Handle mentions
+                mentions = re.findall(r'@(\w+)', comment_text)
+                for username in mentions:
+                    try:
+                        user_mentioned = User.objects.get(username=username)
+                        TicketEvent.objects.create(
+                            ticket=ticket, 
+                            user=request.user, 
+                            event_type='MENÇÃO', 
+                            description=f'O utilizador @{user_mentioned.username} foi mencionado.'
+                        )
+                    except User.DoesNotExist:
+                        pass
+
                 messages.success(request, 'Comentário adicionado.')
         
         elif action == 'submit_rating' and is_owner and ticket.status == 'Fechado':
@@ -94,6 +111,11 @@ def ticket_detail(request, ticket_id):
 
 @login_required(login_url='account:login')
 def create(request):
+    # Verifica se o usuário é staff
+    if request.user.is_staff:
+        messages.error(request, 'Administradores devem criar tickets pela fila de atendimento.')
+        return redirect('ticket:index')
+
     form = TicketForm(request.POST or None, request.FILES or None)
 
     if request.method == 'POST' and form.is_valid():
@@ -273,18 +295,54 @@ def transfer_ticket(request, ticket_id):
 @login_required(login_url='account:login')
 def solutions(request):
     """
-    Página para exibir um banco de soluções de tickets fechados.
+    Página para exibir um banco de soluções de tickets fechados, com filtros.
+    Apenas administradores podem acessar esta página.
     """
-    resolved_tickets_list = Ticket.objects.filter(status='Fechado').prefetch_related(
-        models.Prefetch('events', queryset=TicketEvent.objects.filter(event_type='CONCLUSÃO'), to_attr='conclusion_events')
-    ).order_by('-closed_date')
+    if not request.user.is_staff:
+        messages.error(request, 'Acesso negado. Você não tem permissão para acessar esta página.')
+        return redirect('ticket:my_tickets')
+    query = request.GET.get('q', '')
+    priority = request.GET.get('priority', '')
+    start_date = request.GET.get('start_date', '')
+    end_date = request.GET.get('end_date', '')
 
-    paginator = Paginator(resolved_tickets_list, 10)  # 10 tickets per page
+    # Base query
+    resolved_tickets_list = Ticket.objects.filter(status='Fechado').prefetch_related(
+        Prefetch('events', queryset=TicketEvent.objects.filter(event_type='CONCLUSÃO'), to_attr='conclusion_events')
+    )
+
+    # Filtering
+    if query:
+        resolved_tickets_list = resolved_tickets_list.filter(
+            Q(title__icontains=query) |
+            Q(description__icontains=query) |
+            Q(events__description__icontains=query)
+        ).distinct()
+
+    if priority:
+        resolved_tickets_list = resolved_tickets_list.filter(priority=priority)
+
+    if start_date:
+        resolved_tickets_list = resolved_tickets_list.filter(closed_date__gte=start_date)
+    
+    if end_date:
+        # Adiciona 1 dia ao end_date para incluir todos os tickets do dia
+        end_date_dt = datetime.strptime(end_date, '%Y-%m-%d') + timedelta(days=1)
+        resolved_tickets_list = resolved_tickets_list.filter(closed_date__lt=end_date_dt)
+
+    resolved_tickets_list = resolved_tickets_list.order_by('-closed_date')
+
+    paginator = Paginator(resolved_tickets_list, 10)
     page_number = request.GET.get('page')
     page_obj = paginator.get_page(page_number)
 
     context = {
         'site_title': 'Banco de Soluções',
         'page_obj': page_obj,
+        'priorities': Ticket.PRIORITY_CHOICES,
+        'search_value': query,
+        'priority_value': priority,
+        'start_date': start_date,
+        'end_date': end_date,
     }
     return render(request, 'ticket/solutions.html', context)

@@ -84,7 +84,7 @@
         </div>
 
         <div class="flex flex-wrap items-center gap-2 mb-6">
-            {% if ticket.owner %}
+            {% if request.user == ticket.owner and not ticket.assigned_to %}
                 <a href="{% url 'ticket:update' ticket.id %}" class="bg-indigo-500 text-white px-3 py-2 rounded-md hover:bg-indigo-600 text-sm font-semibold">Editar</a>
             {% endif %}
             {% if request.user.is_staff %}
