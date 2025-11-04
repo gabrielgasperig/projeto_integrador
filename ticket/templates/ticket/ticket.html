@@ -56,7 +56,7 @@
                 <div>
                     {% if not ticket.assigned_to and request.user.is_staff and ticket.status == 'Aberto' %}
                         <a href="{% url 'ticket:assign_ticket' ticket.id %}" class="mt-2 bg-blue-600 text-white px-4 py-2 rounded-md hover:bg-blue-700 font-semibold transition-colors">
-                            Capturar
+                            Atender
                         </a>
                     {% endif %}
                 </div>
@@ -94,7 +94,7 @@
                 <button @click="showTransferModal = true" class="bg-purple-500 text-white px-3 py-2 rounded-md hover:bg-purple-600 text-sm font-semibold">Transferir</button>
             {% endif %}
             {% if request.user.is_staff and ticket.status != 'Fechado' %}
-                <button @click="showConcludeModal = true" class="bg-green-500 text-white px-3 py-2 rounded-md hover:bg-green-600 text-sm font-semibold">Concluir Ticket</button>
+                <button @click="showConcludeModal = true" class="bg-green-500 text-white px-3 py-2 rounded-md hover:bg-green-600 text-sm font-semibold">Concluir Atendimento</button>
             {% endif %}
         </div>
         
