@@ -2,7 +2,45 @@
 
 {% block content %}
 <div class="p-4 md:p-8">
-    <h1 class="text-3xl font-bold text-gray-800 mb-6">Dashboard de Estatísticas</h1>
+    <div class="mb-6">
+        <h1 class="text-2xl md:text-3xl font-bold text-gray-800">Dashboard de Estatísticas</h1>
+        <p class="text-gray-600 mt-2">Visualize e analise os indicadores de desempenho do atendimento.</p>
+    </div>
+
+    <form method="GET" class="flex flex-col sm:flex-row items-end gap-3 mb-6 w-full">
+        <div class="w-full">
+            <label for="start_date" class="text-xs text-gray-500">De:</label>
+            <input type="date" name="start_date" id="start_date" value="{{ request.GET.start_date }}" class="bg-white border border-gray-300 rounded-md px-3 py-1.5 focus:outline-none focus:ring-2 focus:ring-blue-500 w-full">
+        </div>
+        <div class="w-full">
+            <label for="end_date" class="text-xs text-gray-500">Até:</label>
+            <input type="date" name="end_date" id="end_date" value="{{ request.GET.end_date }}" class="bg-white border border-gray-300 rounded-md px-3 py-1.5 focus:outline-none focus:ring-2 focus:ring-blue-500 w-full">
+        </div>
+        <div class="w-full">
+            <label for="assigned_to" class="text-xs text-gray-500">Responsável:</label>
+            <select name="assigned_to" id="assigned_to" class="bg-white border border-gray-300 rounded-md px-3 py-1.5 focus:outline-none focus:ring-2 focus:ring-blue-500 w-full">
+                <option value="">Todos os Responsáveis</option>
+                {% for agent in agents %}
+                    <option value="{{ agent.id }}" {% if request.GET.assigned_to == agent.id|stringformat:"i" %}selected{% endif %}>
+                        {{ agent.first_name }} {{ agent.last_name }}
+                    </option>
+                {% endfor %}
+            </select>
+        </div>
+        <div class="w-full">
+            <label for="priority" class="text-xs text-gray-500">Prioridade:</label>
+            <select name="priority" id="priority" class="bg-white border border-gray-300 rounded-md px-3 py-1.5 focus:outline-none focus:ring-2 focus:ring-blue-500 w-full">
+                <option value="">Todas as Prioridades</option>
+                {% for priority_value, priority_label in priorities %}
+                    <option value="{{ priority_value }}" {% if request.GET.priority == priority_value %}selected{% endif %}>
+                        {{ priority_label }}
+                    </option>
+                {% endfor %}
+            </select>
+        </div>
+        <button type="submit" class="bg-blue-600 text-white py-2 px-4 rounded-md hover:bg-blue-700 transition-colors w-full sm:w-auto font-semibold">Filtrar</button>
+        <a href="{% url 'statistician:index' %}" class="bg-gray-200 text-gray-600 py-2 px-4 rounded-md hover:bg-gray-300 transition-colors whitespace-nowrap w-full sm:w-auto text-center font-semibold">Limpar</a>
+    </form>
 
     <!-- Grid de Métricas Principais -->
     <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6 mb-8">
@@ -148,10 +186,6 @@
         </div>
     </div>
 
-    <div class="mt-8">
-        <a href="{% url 'ticket:index' %}" class="text-blue-600 hover:text-blue-800 font-semibold">
-            &larr; Voltar para a Fila de Atendimento
-        </a>
-    </div>
+    {% include 'global/partials/_backlink.html' %}
 </div>
 {% endblock content %}

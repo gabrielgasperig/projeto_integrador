@@ -1,0 +1,11 @@
+<div class="mt-8">
+    {% if request.user.is_staff %}
+        <a href="{% url 'ticket:index' %}" class="text-blue-600 hover:text-blue-800 font-semibold">
+            &larr; Voltar para a Fila de Atendimento
+        </a>
+    {% else %}
+        <a href="{% url 'ticket:my_tickets' %}" class="text-blue-600 hover:text-blue-800 font-semibold">
+            &larr; Voltar para Meus Tickets
+        </a>
+    {% endif %}
+</div>

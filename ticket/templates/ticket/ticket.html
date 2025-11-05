@@ -46,9 +46,9 @@
                     </span>
                     {% endif %}
                     <span class="font-semibold">
-                        Atribuído a: 
+                        Responsável: 
                         <span class="font-normal">
-                            {{ ticket.assigned_to.get_full_name|default:"Ninguém" }}
+                            {{ ticket.assigned_to.get_full_name|default:"N/A" }}
                         </span>
                     </span>
                 </div>
@@ -91,9 +91,9 @@
                  <button @click="showDeleteModal = true" class="bg-red-500 text-white px-3 py-2 rounded-md hover:bg-red-600 text-sm font-semibold">Excluir</button>
             {% endif %}
             {% if request.user.is_staff and ticket.status != 'Fechado' and ticket.assigned_to %}
-                <button @click="showTransferModal = true" class="bg-purple-500 text-white px-3 py-2 rounded-md hover:bg-purple-600 text-sm font-semibold">Transferir</button>
+                <button @click="showTransferModal = true" class="bg-indigo-500 text-white px-3 py-2 rounded-md hover:bg-indigo-600 text-sm font-semibold">Transferir</button>
             {% endif %}
-            {% if request.user.is_staff and ticket.status != 'Fechado' %}
+            {% if request.user.is_staff and ticket.status != 'Fechado' and ticket.assigned_to and request.user == ticket.assigned_to %}
                 <button @click="showConcludeModal = true" class="bg-green-500 text-white px-3 py-2 rounded-md hover:bg-green-600 text-sm font-semibold">Concluir Atendimento</button>
             {% endif %}
         </div>
@@ -227,7 +227,7 @@
                 </div>
                 <div class="mt-4 flex justify-end gap-2">
                     <button type="button" @click="showTransferModal = false" class="bg-gray-200 px-4 py-2 rounded-md hover:bg-gray-300">Cancelar</button>
-                    <button type="submit" class="bg-purple-500 text-white px-4 py-2 rounded-md hover:bg-purple-600">Confirmar Transferência</button>
+                    <button type="submit" class="bg-indigo-500 text-white px-4 py-2 rounded-md hover:bg-indigo-600">Confirmar Transferência</button>
                 </div>
             </form>
         </div>

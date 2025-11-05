@@ -67,21 +67,6 @@ def ticket_detail(request, ticket_id):
                     ticket=ticket, user=request.user, event_type='COMENTÁRIO', 
                     description=comment_text
                 )
-
-                # Handle mentions
-                mentions = re.findall(r'@(\w+)', comment_text)
-                for username in mentions:
-                    try:
-                        user_mentioned = User.objects.get(username=username)
-                        TicketEvent.objects.create(
-                            ticket=ticket, 
-                            user=request.user, 
-                            event_type='MENÇÃO', 
-                            description=f'O utilizador @{user_mentioned.username} foi mencionado.'
-                        )
-                    except User.DoesNotExist:
-                        pass
-
                 messages.success(request, 'Comentário adicionado.')
         
         elif action == 'submit_rating' and is_owner and ticket.status == 'Fechado':

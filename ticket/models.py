@@ -85,7 +85,6 @@ class TicketEvent(models.Model):
         ('CONCLUSÃO', 'Conclusão'),
         ('EXCLUSÃO', 'Exclusão'),
         ('AVALIAÇÃO', 'Avaliação'),
-        ('MENÇÃO', 'Menção'),
     ]
     ticket = models.ForeignKey(Ticket, on_delete=models.CASCADE, related_name='events')
     user = models.ForeignKey(settings.AUTH_USER_MODEL, on_delete=models.SET_NULL, null=True)

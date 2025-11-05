@@ -13,6 +13,6 @@ class Migration(migrations.Migration):
         migrations.AlterField(
             model_name='ticketevent',
             name='event_type',
-            field=models.CharField(choices=[('CRIAÇÃO', 'Criação'), ('COMENTÁRIO', 'Comentário'), ('EDIÇÃO', 'Edição'), ('STATUS', 'Mudança de Status'), ('TRANSFERÊNCIA', 'Transferência'), ('CONCLUSÃO', 'Conclusão'), ('EXCLUSÃO', 'Exclusão'), ('AVALIAÇÃO', 'Avaliação'), ('MENÇÃO', 'Menção')], max_length=20),
+            field=models.CharField(choices=[('CRIAÇÃO', 'Criação'), ('COMENTÁRIO', 'Comentário'), ('EDIÇÃO', 'Edição'), ('STATUS', 'Mudança de Status'), ('TRANSFERÊNCIA', 'Transferência'), ('CONCLUSÃO', 'Conclusão'), ('EXCLUSÃO', 'Exclusão'), ('AVALIAÇÃO', 'Avaliação')], max_length=20),
         ),
     ]
