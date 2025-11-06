@@ -15,11 +15,7 @@
             Esta secção está em desenvolvimento. No futuro, aqui será feita a gestão de ativos de hardware e software, incluindo a visualização, adição, edição e remoção de itens do inventário.
         </p>
 
-        <div class="mt-6">
-            <a href="{% url 'ticket:index' %}" class="text-blue-600 hover:text-blue-800 font-semibold">
-                &larr; Voltar para a Fila de Atendimento
-            </a>
-        </div>
+        {% include 'global/partials/_backlink.html' %}
     </div>
 </div>
 {% endblock content %}
