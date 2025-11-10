@@ -97,3 +97,11 @@ class TicketEvent(models.Model):
 
     def __str__(self):
         return f'{self.event_type} por {self.user.username} em {self.ticket.title}'
+
+class TicketEventImage(models.Model):
+    event = models.ForeignKey(TicketEvent, on_delete=models.CASCADE, related_name='images')
+    image = models.ImageField(upload_to='ticket_pictures/%Y/%m/')
+    uploaded_at = models.DateTimeField(auto_now_add=True)
+
+    def __str__(self):
+        return f"Imagem para o evento #{self.event.id} do ticket #{self.event.ticket.id}"

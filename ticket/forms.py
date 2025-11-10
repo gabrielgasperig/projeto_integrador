@@ -63,10 +63,12 @@ class RatingForm(forms.ModelForm):
 
 class TransferTicketForm(forms.Form):
 
+
     new_admin = forms.ModelChoiceField(
         queryset=User.objects.filter(is_staff=True),
-        label="Transferir para o Administrador",
-        empty_label="Selecione um administrador"
+        label="Transferir para:",
+        empty_label="Selecione um novo responsável",
+        to_field_name=None
     )
 
     def __init__(self, *args, **kwargs):
@@ -74,4 +76,19 @@ class TransferTicketForm(forms.Form):
         super().__init__(*args, **kwargs)
         if current_admin:
             self.fields['new_admin'].queryset = User.objects.filter(is_staff=True).exclude(pk=current_admin.pk)
+        self.fields['new_admin'].label_from_instance = lambda obj: f"{obj.first_name} {obj.last_name}".strip() or obj.username
 
+class TicketEventForm(forms.Form):
+    comment_text = forms.CharField(
+        label="Comentário",
+        widget=forms.Textarea(attrs={
+            'rows': 4,
+            'placeholder': 'Digite o seu comentário aqui...'
+        }),
+        required=True
+    )
+    images = forms.ImageField(
+        label="Anexar Imagens",
+        widget=forms.FileInput(),
+        required=False
+    )

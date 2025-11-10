@@ -12,7 +12,7 @@ from django.core.paginator import Paginator
 # Importações locais
 from ..models import Ticket, TicketEvent, TicketImage
 from ..forms import (
-    TicketForm, ConcludeTicketForm, DeleteTicketForm, RatingForm, TransferTicketForm
+    TicketForm, ConcludeTicketForm, DeleteTicketForm, RatingForm, TransferTicketForm, TicketEventForm
 )
 
 @login_required(login_url='account:login')
@@ -55,25 +55,34 @@ def ticket_detail(request, ticket_id):
         messages.error(request, 'Não tem permissão para ver este ticket.')
         return redirect('ticket:index')
 
+
     rating_form = RatingForm(instance=ticket)
+    comment_form = TicketEventForm()
+
 
     if request.method == 'POST':
         action = request.POST.get('action')
 
         if action == 'add_comment':
-            comment_text = request.POST.get('comment_text', '').strip()
-            if comment_text:
-                TicketEvent.objects.create(
-                    ticket=ticket, user=request.user, event_type='COMENTÁRIO', 
+            comment_form = TicketEventForm(request.POST, request.FILES)
+            if comment_form.is_valid():
+                comment_text = comment_form.cleaned_data['comment_text']
+                event = TicketEvent.objects.create(
+                    ticket=ticket, user=request.user, event_type='COMENTÁRIO',
                     description=comment_text
                 )
+                images = request.FILES.getlist('images')
+                for img in images:
+                    from ..models import TicketEventImage
+                    TicketEventImage.objects.create(event=event, image=img)
                 messages.success(request, 'Comentário adicionado.')
-        
+            else:
+                messages.error(request, 'Erro ao adicionar comentário. Verifique o formulário.')
+
         elif action == 'submit_rating' and is_owner and ticket.status == 'Fechado':
             rating_form = RatingForm(request.POST, instance=ticket)
             if rating_form.is_valid():
                 rated_ticket = rating_form.save()
-                
                 TicketEvent.objects.create(
                     ticket=ticket, user=request.user, event_type='AVALIAÇÃO',
                     description=f"Utilizador avaliou o atendimento com: {rated_ticket.get_rating_display()}."
@@ -90,6 +99,7 @@ def ticket_detail(request, ticket_id):
         'delete_form': DeleteTicketForm(),
         'rating_form': rating_form,
         'transfer_form': TransferTicketForm(current_admin=ticket.assigned_to),
+        'comment_form': comment_form,
         'site_title': 'Ticket',
     }
     return render(request, 'ticket/ticket.html', context)
