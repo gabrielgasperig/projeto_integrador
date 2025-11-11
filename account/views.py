@@ -41,7 +41,7 @@ def login_view(request):
     if form.is_valid():
         user = form.get_user()
         auth.login(request, user)
-        messages.success(request, f'Bem-vindo(a) de volta, {user.first_name}!')
+        messages.success(request, f'Bem-vindo(a), {user.first_name}!')
         return redirect('ticket:index')
         
     context = {
