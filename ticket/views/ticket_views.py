@@ -5,6 +5,8 @@ from django.utils import timezone
 from datetime import timedelta, datetime
 import re
 from django.contrib.auth.models import User
+from django.core.mail import send_mail
+from django.conf import settings
 
 from django.db.models import Q, Prefetch
 from django.core.paginator import Paginator
@@ -75,6 +77,27 @@ def ticket_detail(request, ticket_id):
                 for img in images:
                     from ..models import TicketEventImage
                     TicketEventImage.objects.create(event=event, image=img)
+                # Notificação: dono comenta → responsável recebe; responsável comenta → dono recebe
+                if ticket.owner == request.user and ticket.assigned_to:
+                    notify_ticket_responsible(
+                        ticket,
+                        subject=f'Novo comentário no ticket: {ticket.title}',
+                        message=(
+                            f'Usuário: {request.user.get_full_name()}\n'
+                            f'Evento: Comentário\n'
+                            f'Mensagem:\n{comment_text}'
+                        )
+                    )
+                elif ticket.assigned_to == request.user:
+                    notify_ticket_owner(
+                        ticket,
+                        subject=f'Novo comentário no ticket: {ticket.title}',
+                        message=(
+                            f'Usuário: {request.user.get_full_name()}\n'
+                            f'Evento: Comentário\n'
+                            f'Mensagem:\n{comment_text}'
+                        )
+                    )
                 messages.success(request, 'Comentário adicionado.')
             else:
                 messages.error(request, 'Erro ao adicionar comentário. Verifique o formulário.')
@@ -87,6 +110,17 @@ def ticket_detail(request, ticket_id):
                     ticket=ticket, user=request.user, event_type='AVALIAÇÃO',
                     description=f"Utilizador avaliou o atendimento com: {rated_ticket.get_rating_display()}."
                 )
+                # Notificação: dono avaliou → responsável recebe
+                if ticket.assigned_to:
+                    notify_ticket_responsible(
+                        ticket,
+                        subject=f'Avaliação recebida no ticket: {ticket.title}',
+                        message=(
+                            f'Usuário: {request.user.get_full_name()}\n'
+                            f'Evento: Avaliação\n'
+                            f'Mensagem: {rated_ticket.get_rating_display()}'
+                        )
+                    )
                 messages.success(request, 'Obrigado pelo seu feedback!')
             else:
                 messages.error(request, 'Por favor, selecione uma avaliação válida.')
@@ -238,6 +272,17 @@ def conclude_ticket(request, ticket_id):
                 ticket=ticket, user=request.user, event_type='CONCLUSÃO', 
                 description=f"Solução: {solution}"
             )
+            # Notificação: responsável fechou → dono recebe
+            if ticket.assigned_to == request.user:
+                notify_ticket_owner(
+                    ticket,
+                    subject=f'Seu ticket foi fechado: {ticket.title}',
+                    message=(
+                        f'Usuário: {request.user.get_full_name()}\n'
+                        f'Evento: Fechamento\n'
+                        f'Mensagem: {solution}'
+                    )
+                )
             messages.success(request, 'Ticket concluído com sucesso.')
         else:
             messages.error(request, 'A solução é obrigatória para concluir o ticket.')
@@ -254,7 +299,7 @@ def assign_ticket(request, ticket_id):
     ticket.status = 'Em Andamento'
     ticket.save()
     TicketEvent.objects.create(ticket=ticket, user=request.user, event_type='STATUS', description=f"Ticket atribuído a {request.user.get_full_name()}. Status alterado para 'Em Andamento'.")
-    messages.success(request, 'Você capturou o ticket.')
+    messages.success(request, 'Ticket em andamento.')
     return redirect('ticket:ticket_detail', ticket_id=ticket.id)
 
 @login_required(login_url='account:login')
@@ -335,3 +380,23 @@ def solutions(request):
         'current_sort': sort,
     }
     return render(request, 'ticket/solutions.html', context)
+
+def notify_ticket_owner(ticket, subject, message):
+    if ticket.owner and ticket.owner.email:
+        send_mail(
+            subject,
+            message,
+            settings.EMAIL_HOST_USER,
+            [ticket.owner.email],
+            fail_silently=True,
+        )
+
+def notify_ticket_responsible(ticket, subject, message):
+    if ticket.assigned_to and ticket.assigned_to.email:
+        send_mail(
+            subject,
+            message,
+            settings.EMAIL_HOST_USER,
+            [ticket.assigned_to.email],
+            fail_silently=True,
+        )

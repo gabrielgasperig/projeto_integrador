@@ -142,5 +142,6 @@ GitHub.sublime-settings
 # Media #
 media/
 
-# Commands #
-# commands/
+# Google #
+gmail_credentials.json
+token_gmail.pickle
