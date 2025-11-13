@@ -8,20 +8,14 @@
     <div class="container mx-auto flex flex-col md:flex-row items-center justify-between px-4">
         <div class="max-w-xl">
             <h1 class="text-4xl md:text-5xl font-bold mb-4">Gerencie seus tickets de forma inteligente</h1>
-            <p class="text-lg mb-8">O Gesticket é a solução completa para gerenciar chamados, organizar seu suporte e aumentar a satisfação dos seus clientes.</p>
+            <p class="text-lg mb-8">O Gesticket é a solução completa para gerenciar tickets, organizar seu suporte e aumentar a satisfação dos seus clientes.</p>
             <div class="flex flex-col sm:flex-row gap-4">
-                <a href="{% url 'account:register' %}" target="_blank" class="bg-blue-600 hover:bg-blue-800 text-white font-semibold py-3 px-8 rounded-lg shadow transition text-center">Cadastrar Grátis</a>
-                <a href="{% url 'account:login' %}" target="_blank" class="bg-white text-blue-700 font-semibold py-3 px-8 rounded-lg shadow hover:bg-blue-100 transition text-center">Entrar</a>
+                <a href="{% url 'account:register' %}" target="_blank" class="bg-white text-blue-700 font-semibold py-3 px-8 rounded-lg shadow hover:bg-blue-100 transition text-center">Experimente Grátis</a>
             </div>
         </div>
         <div class="mt-10 md:mt-0 md:ml-10">
             <div class="bg-white rounded-xl shadow-lg p-4">
-                <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 500 400" fill="none" class="w-80 h-64">
-                    <rect width="500" height="400" rx="10" fill="#e0e7ff"/>
-                    <path d="M150 100h200v50H150zM150 170h200v20H150zM150 210h150v20H150zM150 250h180v20H150z" fill="#2563eb"/>
-                    <circle cx="100" cy="125" r="30" fill="#3b82f6"/>
-                    <path d="M90 120l5 5 15-15" stroke="white" stroke-width="3" stroke-linecap="round"/>
-                </svg>
+                <img src="{% static 'global/images/print_statistician.png' %}" alt="Gesticket" class="w-100 h-80 rounded-md">
             </div>
         </div>
     </div>
@@ -35,10 +29,7 @@
         <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
             <div class="bg-blue-50 rounded-lg p-6 shadow text-center">
                 <div class="mb-4 flex justify-center">
-                    <svg xmlns="http://www.w3.org/2000/svg" class="h-10 w-10 text-blue-600" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
-                        <path d="M9 11l3 3L22 4"/>
-                        <path d="M21 12v7a2 2 0 01-2 2H5a2 2 0 01-2-2V5a2 2 0 012-2h11"/>
-                    </svg>
+                    <svg class="h-10 w-10 text-blue-600" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 11H5m14 0a2 2 0 012 2v6a2 2 0 01-2 2H5a2 2 0 01-2-2v-6a2 2 0 012-2m14 0V9a2 2 0 00-2-2M5 11V9a2 2 0 012-2m0 0V5a2 2 0 012-2h6a2 2 0 012 2v2M7 7h10" /></svg>
                 </div>
                 <h3 class="font-semibold text-lg mb-2">Gestão de Tickets</h3>
                 <p>Crie, atribua e acompanhe tickets de forma simples e organizada. Mantenha tudo sob controle.</p>
@@ -46,10 +37,10 @@
             <div class="bg-blue-50 rounded-lg p-6 shadow text-center">
                 <div class="mb-4 flex justify-center">
                     <svg xmlns="http://www.w3.org/2000/svg" class="h-10 w-10 text-blue-600" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
-                        <rect x="3" y="4" width="18" height="18" rx="2" ry="2"/>
-                        <line x1="16" y1="2" x2="16" y2="6"/>
-                        <line x1="8" y1="2" x2="8" y2="6"/>
-                        <line x1="3" y1="10" x2="21" y2="10"/>
+                        <circle cx="12" cy="13" r="8" />
+                        <path d="M12 7v6l3 3" />
+                        <rect x="9" y="2" width="6" height="2" rx="1" />
+                        <path d="M19.03 7.97l1.5-1.5" />
                     </svg>
                 </div>
                 <h3 class="font-semibold text-lg mb-2">Controle de SLA</h3>
@@ -70,29 +61,25 @@
             <div class="bg-blue-50 rounded-lg p-6 shadow text-center">
                 <div class="mb-4 flex justify-center">
                     <svg xmlns="http://www.w3.org/2000/svg" class="h-10 w-10 text-blue-600" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
-                        <line x1="12" y1="1" x2="12" y2="23"/>
-                        <path d="M17 5H9.5a3.5 3.5 0 000 7h5a3.5 3.5 0 010 7H6"/>
+                        <rect x="3" y="5" width="18" height="14" rx="2" ry="2" />
+                        <polyline points="3 7 12 13 21 7" />
                     </svg>
                 </div>
-                <h3 class="font-semibold text-lg mb-2">Integração Gmail</h3>
+                <h3 class="font-semibold text-lg mb-2">Integração com Gmail</h3>
                 <p>Importe tickets diretamente do Gmail e centralize todo seu atendimento em um só lugar.</p>
             </div>
             <div class="bg-blue-50 rounded-lg p-6 shadow text-center">
                 <div class="mb-4 flex justify-center">
-                    <svg xmlns="http://www.w3.org/2000/svg" class="h-10 w-10 text-blue-600" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
-                        <path d="M3 3v18h18"/>
-                        <path d="M18 17V9M13 17v-6M8 17v-3"/>
-                    </svg>
+                    <svg class="h-10 w-10 text-blue-600" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 19v-6a2 2 0 00-2-2H5a2 2 0 00-2 2v6a2 2 0 002 2h2a2 2 0 002-2zm0 0V9a2 2 0 012-2h2a2 2 0 012 2v10m-6 0a2 2 0 002 2h2a2 2 0 002-2m0 0V5a2 2 0 012-2h2a2 2 0 012 2v14a2 2 0 01-2 2h-2a2 2 0 01-2-2z" /></svg>
                 </div>
-                <h3 class="font-semibold text-lg mb-2">Estatísticas</h3>
+                <h3 class="font-semibold text-lg mb-2">Dashboard de Estatísticas</h3>
                 <p>Visualize dados importantes através de gráficos e relatórios detalhados do seu sistema.</p>
             </div>
             <div class="bg-blue-50 rounded-lg p-6 shadow text-center">
                 <div class="mb-4 flex justify-center">
-                    <svg xmlns="http://www.w3.org/2000/svg" class="h-10 w-10 text-blue-600" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
-                        <path d="M20.59 13.41l-7.17 7.17a2 2 0 01-2.83 0L2 12V2h10l8.59 8.59a2 2 0 010 2.82z"/>
-                        <line x1="7" y1="7" x2="7.01" y2="7"/>
-                    </svg>
+                    <svg xmlns="http://www.w3.org/2000/svg" class="h-10 w-10 text-blue-600" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 8h14M5 8a2 2 0 110-4h14a2 2 0 110 4M5 8v10a2 2 0 002 2h10a2 2 0 002-2V8m-9 4h4" />
+                </svg>
                 </div>
                 <h3 class="font-semibold text-lg mb-2">Gestão de Inventário</h3>
                 <p>Controle equipamentos e recursos, vinculando-os aos tickets quando necessário.</p>
@@ -106,25 +93,12 @@
     <div class="container mx-auto flex flex-col md:flex-row items-center gap-10 px-4">
         <div class="flex-1">
             <h2 class="text-2xl font-bold text-blue-700 mb-4">Sobre o Gesticket</h2>
-            <p class="mb-2">O Gesticket foi desenvolvido para simplificar e otimizar o gerenciamento de tickets de suporte. Com uma interface intuitiva e recursos poderosos, nossa plataforma ajuda equipes de todos os tamanhos a oferecer um atendimento de qualidade.</p>
-            <p class="mb-4">Desde pequenas empresas até grandes corporações, o Gesticket se adapta às suas necessidades, oferecendo flexibilidade, controle e visibilidade completa sobre todos os chamados.</p>
-            <ul class="list-disc pl-5 text-gray-700 space-y-1">
-                <li>Interface intuitiva e fácil de usar</li>
-                <li>Sistema de priorização inteligente</li>
-                <li>Notificações em tempo real</li>
-                <li>Histórico completo de interações</li>
-                <li>Avaliação de satisfação do cliente</li>
-            </ul>
+            <p class="text-lg mb-8">O Gesticket foi criado para transformar a forma como sua equipe gerencia tickets de suporte. Com uma interface intuitiva e recursos inteligentes, você centraliza todos os atendimentos em um só lugar. Tudo isso com total visibilidade sobre cada etapa do processo, para que nada passe despercebido.</p>
+            <p class="text-lg mb-8">De pequenas empresas a grandes corporações, o Gesticket se adapta ao seu ritmo e às suas necessidades. Ele oferece controle, eficiência e clareza para que sua equipe entregue um atendimento ágil e de qualidade — aumentando a satisfação dos clientes e simplificando o dia a dia do suporte.</p>
         </div>
         <div class="flex-1 flex justify-center">
             <div class="bg-white rounded-xl shadow-lg p-4">
-                <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 400 400" fill="none" class="w-72 h-72">
-                    <rect width="400" height="400" rx="10" fill="#dbeafe"/>
-                    <circle cx="200" cy="150" r="60" fill="#3b82f6"/>
-                    <rect x="100" y="230" width="200" height="15" rx="7.5" fill="#60a5fa"/>
-                    <rect x="100" y="260" width="160" height="15" rx="7.5" fill="#93c5fd"/>
-                    <rect x="100" y="290" width="180" height="15" rx="7.5" fill="#bfdbfe"/>
-                </svg>
+                <img src="{% static 'global/images/print_statistician.png' %}" alt="Gesticket" class="w-100 h-80 rounded-md">
             </div>
         </div>
     </div>
