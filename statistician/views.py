@@ -54,6 +54,14 @@ def index(request):
     # Média de Avaliação
     average_rating = tickets.filter(rating__isnull=False).aggregate(avg_rating=Avg('rating'))['avg_rating']
 
+    # Tickets em Atraso (SLA)
+    now = timezone.now()
+    overdue_tickets = tickets.filter(
+        status__in=['Aberto', 'Em Andamento'],
+        sla_deadline__isnull=False,
+        sla_deadline__lt=now
+    ).count()
+
     # Tickets por Agente
     tickets_per_agent = tickets.filter(assigned_to__isnull=False).values(
         'assigned_to__first_name', 'assigned_to__last_name'
@@ -73,6 +81,7 @@ def index(request):
         'avg_resolution_time': avg_resolution_time,
         'sla_compliance_percentage': sla_compliance_percentage,
         'average_rating': average_rating,
+        'overdue_tickets': overdue_tickets,
         'tickets_per_agent': tickets_per_agent,
         'site_title': 'Dashboard de Estatísticas',
         # Dados para os filtros
