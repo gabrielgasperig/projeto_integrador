@@ -3,22 +3,24 @@
 <form class="space-y-4" method="POST">
     {% csrf_token %}
 
+
     {% for field in form %}
     <div>
         <label for="{{ field.id_for_label }}" class="block text-sm font-medium text-gray-700">
             {{ field.label }}
         </label>
-        
         <div class="mt-1">
-            {% render_field field class="block w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm placeholder-gray-400 focus:outline-none focus:ring-blue-500 focus:border-blue-500 sm:text-sm" %}
+            {% if field.name == 'username' %}
+                {% render_field field class="block w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm placeholder-gray-400 focus:outline-none focus:ring-blue-500 focus:border-blue-500 sm:text-sm" readonly="readonly" %}
+            {% else %}
+                {% render_field field class="block w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm placeholder-gray-400 focus:outline-none focus:ring-blue-500 focus:border-blue-500 sm:text-sm" %}
+            {% endif %}
         </div>
-
         {% if field.errors %}
             {% for error in field.errors %}
                 <p class="mt-1 text-xs text-red-600">{{ error }}</p>
             {% endfor %}
         {% endif %}
-
         {% if field.help_text %}
             <p class="mt-1 text-xs text-gray-500">{{ field.help_text }}</p>
         {% endif %}

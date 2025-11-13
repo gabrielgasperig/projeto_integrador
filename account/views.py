@@ -8,6 +8,11 @@ from django.contrib import messages
 from .forms import RegisterForm, RegisterUpdateForm
 
 def register_view(request):
+    # Se o usuário está autenticado, desloga antes de mostrar a tela de cadastro
+    if request.user.is_authenticated:
+        auth.logout(request)
+        messages.info(request, 'Você foi desconectado para criar uma nova conta.')
+    
     form = RegisterForm(request.POST or None)
     if form.is_valid():
         form.save()
@@ -33,6 +38,11 @@ def user_update(request):
     return render(request, 'account/user_update.html', context)
 
 def login_view(request):
+    # Se o usuário já está autenticado, redireciona para o sistema
+    if request.user.is_authenticated:
+        messages.info(request, 'Você já está logado!')
+        return redirect('ticket:index')
+    
     form = AuthenticationForm(request, data=request.POST or None)
     
     if request.method == 'POST' and not form.is_valid():

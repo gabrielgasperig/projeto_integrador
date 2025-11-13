@@ -58,7 +58,12 @@ def all_tickets(request):
     sort_by = request.GET.get('sort', '-id')
 
     if search_value:
-        tickets_list = tickets_list.filter(Q(title__icontains=search_value) | Q(description__icontains=search_value))
+        tickets_list = tickets_list.filter(
+            Q(title__icontains=search_value) |
+            Q(description__icontains=search_value) |
+            Q(owner__first_name__icontains=search_value) |
+            Q(owner__last_name__icontains=search_value)
+        ).distinct()
     if status_filter:
         tickets_list = tickets_list.filter(status__iexact=status_filter)
     if priority_filter:

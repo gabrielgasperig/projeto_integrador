@@ -17,7 +17,7 @@
             <input type="date" name="end_date" id="end_date" value="{{ end_date }}" class="bg-white border border-gray-300 rounded-md px-3 py-1.5 focus:outline-none focus:ring-2 focus:ring-blue-500 w-full">
         </div>
         <button type="submit" class="bg-blue-600 text-white py-2 px-4 rounded-md hover:bg-blue-700 transition-colors w-full sm:w-auto font-semibold">Filtrar</button>
-        <a href="" class="bg-gray-200 text-gray-600 py-2 px-4 rounded-md hover:bg-gray-300 transition-colors whitespace-nowrap w-full sm:w-auto text-center font-semibold">Limpar</a>
+        <a href="{% url 'ticket:solutions' %}" class="bg-gray-200 text-gray-600 py-2 px-4 rounded-md hover:bg-gray-300 transition-colors whitespace-nowrap w-full sm:w-auto text-center font-semibold">Limpar</a>
     </form>
 
     <div class="bg-white shadow-md rounded-lg overflow-hidden">

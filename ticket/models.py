@@ -1,8 +1,46 @@
+def add_working_hours(start, hours):
+    """
+    Soma um número de horas úteis a uma data inicial, considerando apenas
+    os períodos de trabalho: 8h-12h e 14h-18h, de segunda a sexta.
+    """
+    from datetime import timedelta, time
+    current = start
+    hours_left = hours
+    work_periods = [(time(8, 0), time(12, 0)), (time(14, 0), time(18, 0))]
+    while hours_left > 0:
+        if current.weekday() < 5:
+            for period_start, period_end in work_periods:
+                period_start_dt = current.replace(hour=period_start.hour, minute=period_start.minute, second=0, microsecond=0)
+                period_end_dt = current.replace(hour=period_end.hour, minute=period_end.minute, second=0, microsecond=0)
+                if current < period_start_dt:
+                    current = period_start_dt
+                if period_start_dt <= current < period_end_dt:
+                    available = (period_end_dt - current).total_seconds() / 3600
+                    if hours_left <= available:
+                        return current + timedelta(hours=hours_left)
+                    else:
+                        hours_left -= available
+                        current = period_end_dt
+        # Avança para o próximo dia útil
+        current = (current + timedelta(days=1)).replace(hour=8, minute=0, second=0, microsecond=0)
+    return current
 from django.db import models
 from django.conf import settings
 from django.utils import timezone
+from datetime import time, timedelta
 
 class Ticket(models.Model):
+    @staticmethod
+    def calculate_sla_deadline(start, priority):
+        """Calcula o deadline de SLA somando horas úteis conforme a prioridade."""
+        sla_times = {
+            'Baixa': 72,
+            'Média': 48,
+            'Alta': 24,
+            'Urgente': 8,
+        }
+        horas = sla_times.get(priority, 48)
+        return add_working_hours(start, horas)
     
     STATUS_CHOICES = [
         ('Aberto', 'Aberto'),
@@ -41,12 +79,43 @@ class Ticket(models.Model):
     def __str__(self):
         return self.title
 
+
+    def get_working_time_delta(self, start, end):
+        """
+        Calcula o tempo útil (em timedelta) entre dois datetimes, considerando apenas
+        os períodos de trabalho: 8h-12h e 14h-18h, de segunda a sexta.
+        """
+        if start >= end:
+            return timedelta(0)
+        total = timedelta(0)
+        current = start
+        work_periods = [(time(8, 0), time(12, 0)), (time(14, 0), time(18, 0))]
+        while current < end:
+            if current.weekday() < 5:  # 0=segunda, 4=sexta
+                for period_start, period_end in work_periods:
+                    period_start_dt = current.replace(hour=period_start.hour, minute=period_start.minute, second=0, microsecond=0)
+                    period_end_dt = current.replace(hour=period_end.hour, minute=period_end.minute, second=0, microsecond=0)
+                    # Corrige para o dia seguinte se necessário
+                    if period_end_dt <= period_start_dt:
+                        period_end_dt += timedelta(days=1)
+                    # Calcula interseção do período de trabalho com [current, end]
+                    period_real_start = max(current, period_start_dt)
+                    period_real_end = min(end, period_end_dt)
+                    if period_real_start < period_real_end:
+                        total += period_real_end - period_real_start
+            # Avança para o próximo dia útil
+            next_day = (current + timedelta(days=1)).replace(hour=0, minute=0, second=0, microsecond=0)
+            current = next_day
+        return total
+
     @property
     def time_to_sla(self):
-        """Calcula o tempo restante para o fim do prazo de SLA."""
+        """Calcula o tempo útil restante para o fim do prazo de SLA."""
         if not self.sla_deadline or self.status == 'Fechado':
             return None
-        return self.sla_deadline - timezone.now()
+        now = timezone.localtime(timezone.now())
+        deadline = timezone.localtime(self.sla_deadline)
+        return self.get_working_time_delta(now, deadline)
 
     @property
     def sla_status(self):

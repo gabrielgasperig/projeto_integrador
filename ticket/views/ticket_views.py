@@ -147,15 +147,8 @@ def create(request):
         ticket = form.save(commit=False)
         ticket.owner = request.user
 
-        sla_times = {
-            'Baixa': timedelta(hours=72),
-            'Média': timedelta(hours=48),    
-            'Alta': timedelta(hours=24),     
-            'Urgente': timedelta(hours=8),     
-        }
-       
-        sla_duration = sla_times.get(ticket.priority, timedelta(hours=48)) 
-        ticket.sla_deadline = timezone.now() + sla_duration
+        from ticket.models import Ticket
+        ticket.sla_deadline = Ticket.calculate_sla_deadline(timezone.now(), ticket.priority)
         ticket.save()
 
         images = request.FILES.getlist('images')
@@ -350,7 +343,8 @@ def solutions(request):
         resolved_tickets_list = resolved_tickets_list.filter(
             Q(title__icontains=query) |
             Q(description__icontains=query) |
-            Q(events__description__icontains=query)
+            Q(assigned_to__first_name__icontains=query) |
+            Q(assigned_to__last_name__icontains=query)
         ).distinct()
 
     if start_date:

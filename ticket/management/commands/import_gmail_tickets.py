@@ -3,6 +3,8 @@ from django.contrib.auth import get_user_model
 from ticket.models import Ticket, TicketImage, TicketEvent
 from utils.gmail_integration import get_gmail_service
 from django.conf import settings
+
+from datetime import timedelta
 from django.core.files.base import ContentFile
 import base64
 import email
@@ -42,11 +44,17 @@ class Command(BaseCommand):
                         break
             else:
                 body = base64.urlsafe_b64decode(payload['body']['data']).decode('utf-8')
-            # Cria o ticket
+            # Define prioridade padrão e calcula o SLA igual ao sistema
+            prioridade = 'Média'
+            from django.utils import timezone
+            from ticket.models import Ticket
+            sla_deadline = Ticket.calculate_sla_deadline(timezone.now(), prioridade)
             ticket = Ticket.objects.create(
                 title=subject[:100],
                 description=body,
                 owner=user,
+                priority=prioridade,
+                sla_deadline=sla_deadline,
             )
             # Cria evento de criação no histórico
             TicketEvent.objects.create(
