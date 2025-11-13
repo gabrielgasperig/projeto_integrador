@@ -10,7 +10,7 @@ from ..models import Ticket
 def is_admin(user):
     return user.is_staff
 
-@login_required(login_url='account:login')
+@login_required
 def index(request):
     """
     Página principal da aplicação.
@@ -42,7 +42,7 @@ def index(request):
     }
     return render(request, 'ticket/index.html', context)
 
-@login_required(login_url='account:login')
+@login_required
 @user_passes_test(is_admin, login_url='ticket:index')
 def all_tickets(request):
     """

@@ -17,7 +17,7 @@ from ..forms import (
     TicketForm, ConcludeTicketForm, DeleteTicketForm, RatingForm, TransferTicketForm, TicketEventForm
 )
 
-@login_required(login_url='account:login')
+@login_required
 def my_tickets(request):
    
     if request.user.is_staff:
@@ -48,7 +48,7 @@ def my_tickets(request):
 
 
 
-@login_required(login_url='account:login')
+@login_required
 def ticket_detail(request, ticket_id):
     ticket = get_object_or_404(Ticket, pk=ticket_id)
     is_owner = ticket.owner == request.user
@@ -136,7 +136,7 @@ def ticket_detail(request, ticket_id):
     }
     return render(request, 'ticket/ticket.html', context)
 
-@login_required(login_url='account:login')
+@login_required
 def create(request):
 
     form = TicketForm(request.POST or None, request.FILES or None)
@@ -171,7 +171,7 @@ def create(request):
     return render(request, 'ticket/create.html', context)
 
 
-@login_required(login_url='account:login')
+@login_required
 def update(request, ticket_id):
     ticket = get_object_or_404(Ticket, pk=ticket_id, owner=request.user)
     form = TicketForm(request.POST or None, request.FILES or None, instance=ticket)
@@ -222,7 +222,7 @@ def update(request, ticket_id):
     
     return render(request, 'ticket/create.html', context)
 
-@login_required(login_url='account:login')
+@login_required
 def delete(request, ticket_id):
     ticket = get_object_or_404(Ticket, pk=ticket_id)
     if not (ticket.owner == request.user or request.user.is_staff):
@@ -245,7 +245,7 @@ def delete(request, ticket_id):
             return redirect('ticket:ticket_detail', ticket_id=ticket.id)
 
 
-@login_required(login_url='account:login')
+@login_required
 def conclude_ticket(request, ticket_id):
     ticket = get_object_or_404(Ticket, pk=ticket_id)
     if not request.user.is_staff:
@@ -279,7 +279,7 @@ def conclude_ticket(request, ticket_id):
     
     return redirect('ticket:ticket_detail', ticket_id=ticket.id)
 
-@login_required(login_url='account:login')
+@login_required
 def assign_ticket(request, ticket_id):
     if not request.user.is_staff:
         messages.error(request, 'Ação não permitida.')
@@ -292,7 +292,7 @@ def assign_ticket(request, ticket_id):
     messages.success(request, 'Ticket em andamento.')
     return redirect('ticket:ticket_detail', ticket_id=ticket.id)
 
-@login_required(login_url='account:login')
+@login_required
 def transfer_ticket(request, ticket_id):
     ticket = get_object_or_404(Ticket, pk=ticket_id)
     
@@ -318,7 +318,7 @@ def transfer_ticket(request, ticket_id):
     
     return redirect('ticket:ticket_detail', ticket_id=ticket.id)
 
-@login_required(login_url='account:login')
+@login_required
 def solutions(request):
     """
     Página para exibir um banco de soluções de tickets fechados, com filtros.

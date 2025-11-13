@@ -158,6 +158,11 @@ MESSAGE_TAGS = {
     messages.ERROR: 'red',
 }
 
+# URL de redirecionamento quando o login é necessário
+LOGIN_URL = '/account/login/'
+LOGIN_REDIRECT_URL = '/ticket/'
+LOGOUT_REDIRECT_URL = '/'
+
 try:
     from .local_settings import *
 except ImportError:

@@ -22,7 +22,7 @@ def register_view(request):
     }
     return render(request, 'account/register.html', context)
 
-@login_required(login_url='account:login')
+@login_required
 def user_update(request):
     form = RegisterUpdateForm(request.POST or None, instance=request.user)
     if form.is_valid():
@@ -57,7 +57,7 @@ def login_view(request):
     }
     return render(request, 'account/login.html', context)
 
-@login_required(login_url='coaccountnta:login')
+@login_required
 def logout_view(request):
     auth.logout(request)
     messages.success(request, 'Você saiu da sua conta.')
