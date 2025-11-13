@@ -7,17 +7,14 @@
 <body class="h-full">
 
     <div class="flex flex-col min-h-screen">
-        <!-- Landing Page Header -->
         <header class="bg-gray-800 shadow-sm sticky top-0 z-50">
             <nav class="container mx-auto px-4 py-4">
                 <div class="flex items-center justify-between">
-                    <!-- Logo -->
                     <div class="flex items-center gap-2">
                         <img src="{% static 'global/images/logo_gesticket.png' %}" alt="Gesticket Logo" class="h-10">
                         <span class="text-2xl font-bold text-white">Gesticket</span>
                     </div>
 
-                    <!-- Desktop Navigation -->
                     <ul class="hidden md:flex items-center gap-8">
                         <li><a href="#home" class="text-gray-200 hover:text-blue-400 font-medium transition">Início</a></li>
                         <li><a href="#features" class="text-gray-200 hover:text-blue-400 font-medium transition">Recursos</a></li>
@@ -25,13 +22,11 @@
                         <li><a href="#contact" class="text-gray-200 hover:text-blue-400 font-medium transition">Contato</a></li>
                     </ul>
 
-                    <!-- Auth Buttons -->
                     <div class="hidden md:flex items-center gap-4">
                         <a href="{% url 'account:login' %}" target="_blank" class="text-gray-200 hover:text-blue-400 font-medium transition">Entrar</a>
                         <a href="{% url 'account:register' %}" target="_blank" class="bg-blue-600 hover:bg-blue-700 text-white font-semibold py-2 px-6 rounded-lg transition">Experimente Grátis</a>
                     </div>
 
-                    <!-- Mobile Menu Button -->
                     <div x-data="{ open: false }" class="md:hidden">
                         <button @click="open = !open" class="p-2 rounded-lg hover:bg-gray-700">
                             <svg class="h-6 w-6 text-gray-200" fill="none" viewBox="0 0 24 24" stroke="currentColor">
@@ -54,23 +49,18 @@
             </nav>
         </header>
 
-        <!-- Main Content -->
         <main class="flex-grow">
             {% block content %}{% endblock content %}
         </main>
 
-        <!-- Footer -->
         <footer id="contact" class="bg-gray-800 text-gray-200 py-12">
             <div class="container mx-auto px-4">
-                <!-- Contact Section Header -->
                 <div class="text-center mb-10">
                     <h2 class="text-3xl font-bold text-white mb-2">Entre em Contato</h2>
                     <p class="text-gray-400">Tem dúvidas? Estamos aqui para ajudar!</p>
                 </div>
 
-                <!-- Main Footer Content -->
                 <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-8 mb-8">
-                    <!-- About -->
                     <div>
                         <div class="flex items-center gap-2 mb-4">
                             <img src="{% static 'global/images/logo_gesticket.png' %}" alt="Gesticket Logo" class="h-8">
@@ -79,7 +69,6 @@
                         <p class="text-gray-400">Sistema de gestão de tickets inteligente e eficiente para transformar seu atendimento.</p>
                     </div>
 
-                    <!-- Quick Links -->
                     <div>
                         <h4 class="font-semibold text-white mb-4">Links Rápidos</h4>
                         <ul class="space-y-2">
@@ -90,7 +79,6 @@
                         </ul>
                     </div>
 
-                    <!-- Contact Info -->
                     <div>
                         <h4 class="font-semibold text-white mb-4">Contato</h4>
                         <ul class="space-y-3">
@@ -116,7 +104,6 @@
                         </ul>
                     </div>
 
-                    <!-- Legal -->
                     <div>
                         <h4 class="font-semibold text-white mb-4">Legal</h4>
                         <ul class="space-y-2">
@@ -126,7 +113,6 @@
                     </div>
                 </div>
 
-                <!-- Copyright -->
                 <div class="border-t border-gray-700 pt-6 text-center text-gray-400">
                     <p>&copy; 2025 Gesticket. Todos os direitos reservados.</p>
                 </div>

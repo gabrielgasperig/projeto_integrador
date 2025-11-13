@@ -1,5 +1,3 @@
-
-/* Cores principais */
 :root {
 	--primary-blue: #2563eb;
 	--primary-blue-dark: #1e40af;
@@ -69,7 +67,6 @@ body {
 	background: var(--primary-blue-dark);
 }
 
-/* Hero Section */
 .hero {
 	background: linear-gradient(90deg, var(--primary-blue-light) 0%, var(--primary-blue) 100%);
 	color: var(--white);
@@ -138,7 +135,6 @@ body {
 	padding: 1rem;
 }
 
-/* Features Section */
 .features {
 	background: var(--white);
 	padding: 4rem 0 2rem 0;
@@ -171,7 +167,6 @@ body {
 	font-size: 2rem;
 }
 
-/* About Section */
 .about {
 	background: var(--sidebar-bg);
 	padding: 4rem 0 2rem 0;
@@ -198,7 +193,6 @@ body {
 	font-size: 1rem;
 }
 
-/* CTA Section */
 .cta {
 	background: var(--primary-blue);
 	color: var(--white);
@@ -206,7 +200,6 @@ body {
 	padding: 3rem 0 2rem 0;
 }
 
-/* Contact Section */
 .contact {
 	background: var(--white);
 	padding: 4rem 0 2rem 0;
@@ -252,7 +245,6 @@ body {
 	font-size: 0.95rem;
 }
 
-/* Utilitários */
 .container {
 	width: 90%;
 	max-width: 1200px;

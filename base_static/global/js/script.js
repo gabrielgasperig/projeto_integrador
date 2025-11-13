@@ -1,11 +1,9 @@
-// Smooth scroll para âncoras considerando header fixo (compatível e robusto)
 document.addEventListener('DOMContentLoaded', function() {
     function getHeaderHeight() {
         const header = document.querySelector('header');
         if (!header) return 0;
         return header.offsetHeight || 0;
     }
-    // Aplica o scroll customizado para links do menu principal, mobile e footer
     const desktopNav = document.querySelectorAll('ul.md\\:flex.items-center.gap-8 a[href^="#"]');
     const mobileNav = document.querySelectorAll('ul.flex.flex-col.gap-4.px-4 a[href^="#"]');
     const footerLinks = document.querySelectorAll('footer ul.space-y-2 a[href^="#"]');

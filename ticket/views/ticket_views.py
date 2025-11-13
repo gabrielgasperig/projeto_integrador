@@ -77,7 +77,6 @@ def ticket_detail(request, ticket_id):
                 for img in images:
                     from ..models import TicketEventImage
                     TicketEventImage.objects.create(event=event, image=img)
-                # Notificação: dono comenta → responsável recebe; responsável comenta → dono recebe
                 if ticket.owner == request.user and ticket.assigned_to:
                     notify_ticket_responsible(
                         ticket,
@@ -110,7 +109,6 @@ def ticket_detail(request, ticket_id):
                     ticket=ticket, user=request.user, event_type='AVALIAÇÃO',
                     description=f"Utilizador avaliou o atendimento com: {rated_ticket.get_rating_display()}."
                 )
-                # Notificação: dono avaliou → responsável recebe
                 if ticket.assigned_to:
                     notify_ticket_responsible(
                         ticket,
@@ -265,7 +263,6 @@ def conclude_ticket(request, ticket_id):
                 ticket=ticket, user=request.user, event_type='CONCLUSÃO', 
                 description=f"Solução: {solution}"
             )
-            # Notificação: responsável fechou → dono recebe
             if ticket.assigned_to == request.user:
                 notify_ticket_owner(
                     ticket,
@@ -354,7 +351,6 @@ def solutions(request):
         end_date_dt = datetime.strptime(end_date, '%Y-%m-%d') + timedelta(days=1)
         resolved_tickets_list = resolved_tickets_list.filter(closed_date__lt=end_date_dt)
 
-    # Ordenação dinâmica
     allowed_sorts = ['title', '-title', 'closed_date', '-closed_date']
     if sort in allowed_sorts:
         resolved_tickets_list = resolved_tickets_list.order_by(sort)

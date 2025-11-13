@@ -63,7 +63,6 @@ class RatingForm(forms.ModelForm):
 
 class TransferTicketForm(forms.Form):
 
-
     new_admin = forms.ModelChoiceField(
         queryset=User.objects.filter(is_staff=True),
         label="Transferir para:",

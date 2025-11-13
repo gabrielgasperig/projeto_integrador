@@ -4,10 +4,8 @@ from .views import ticket_views, admin_views
 app_name = 'ticket'
 
 urlpatterns = [
-    # URLs PRINCIPAIS
     path('', admin_views.index, name='index'),
     
-    # URLs TICKET
     path('meus-tickets/', ticket_views.my_tickets, name='my_tickets'),
     path('todos-tickets/', admin_views.all_tickets, name='all_tickets'),
     path('solutions/', ticket_views.solutions, name='solutions'),
