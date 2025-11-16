@@ -2,7 +2,7 @@
 {% load widget_tweaks %}
 
 {% block content %}
-<div class="container mx-auto p-4 md:p-8 min-h-screen" x-data="{ showConcludeModal: false, showDeleteModal: false, showTransferModal: false }">
+<div class="container mx-auto p-4 md:p-8 min-h-screen" x-data="{ showConcludeModal: false, showDeleteModal: false, showTransferModal: false, showPriorityModal: false }">
     <div class="bg-white p-6 rounded-lg shadow-lg max-w-4xl mx-auto">
         
        <div class="mb-6 border-b pb-4">
@@ -32,7 +32,7 @@
                      {% if ticket.sla_deadline %}
                     <span class="font-semibold flex items-center gap-2">
                         Prazo SLA:
-                        <span class="font-normal">{{ ticket.sla_deadline|date:"d/m/Y H:i" }}</span>
+                        <span class="px-2 py-1 rounded-md text-xs font-medium">{{ ticket.sla_deadline|date:"d/m/Y H:i" }}</span>
                         {% with sla_status=ticket.sla_status %}
                             <span class="px-2 py-1 rounded-md text-xs font-medium
                                 {% if sla_status == 'No Prazo' %} bg-gray-100 text-gray-800 {% endif %}
@@ -47,17 +47,17 @@
                     {% endif %}
                     <span class="font-semibold">
                         Responsável: 
-                        <span class="font-normal">
-                            {{ ticket.assigned_to.get_full_name|default:"N/A" }}
+                        <span class="px-2 py-1 rounded-md text-xs font-medium">
+                            {{ ticket.assigned_to.get_full_name|default:"A definir" }}
                         </span>
                     </span>
                 </div>
 
-                <div>
+                <div class="flex items-center gap-2">
                     {% if not ticket.assigned_to and request.user.is_staff and ticket.status == 'Aberto' %}
-                        <a href="{% url 'ticket:assign_ticket' ticket.id %}" class="mt-2 bg-blue-600 text-white px-4 py-2 rounded-md hover:bg-blue-700 font-semibold transition-colors">
+                        <button @click="showPriorityModal = true" class="mt-2 bg-blue-600 text-white px-4 py-2 rounded-md hover:bg-blue-700 font-semibold transition-colors">
                             Atender
-                        </a>
+                        </button>
                     {% endif %}
                 </div>
             </div>
@@ -87,7 +87,7 @@
             {% if request.user == ticket.owner and not ticket.assigned_to %}
                 <a href="{% url 'ticket:update' ticket.id %}" class="bg-indigo-500 text-white px-3 py-2 rounded-md hover:bg-indigo-600 text-sm font-semibold">Editar</a>
             {% endif %}
-            {% if request.user.is_staff %}
+            {% if request.user == ticket.owner and not ticket.assigned_to %}
                  <button @click="showDeleteModal = true" class="bg-red-500 text-white px-3 py-2 rounded-md hover:bg-red-600 text-sm font-semibold">Excluir</button>
             {% endif %}
             {% if request.user.is_staff and ticket.status != 'Fechado' and ticket.assigned_to %}
@@ -189,7 +189,7 @@
         {% endif %}
     </div>
 
-    <!-- MODAIS -->
+    <!-- Modais -->
     <div x-show="showConcludeModal" class="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50 p-4" style="display: none;">
         <div @click.away="showConcludeModal = false" class="bg-white p-6 rounded-lg shadow-xl w-full max-w-md">
             <h3 class="text-xl font-bold mb-4">Concluir Ticket</h3>
@@ -237,6 +237,35 @@
             </form>
         </div>
     </div>
+
+    {% if ticket.priority == 'A definir' and request.user.is_staff and ticket.status == 'Aberto' %}
+    <div x-show="showPriorityModal" class="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50 p-4" style="display: none;">
+        <div @click.away="showPriorityModal = false" class="bg-white p-6 rounded-lg shadow-xl w-full max-w-md">
+            <h3 class="text-xl font-bold mb-4">Definir Prioridade</h3>
+            <p class="text-sm text-gray-600 mb-4">Para atender este ticket, é necessário definir a prioridade.</p>
+            <form action="{% url 'ticket:assign_ticket' ticket.id %}" method="POST">
+                {% csrf_token %}
+                <div class="space-y-4">
+                    <div>
+                        <label class="block text-sm font-medium text-gray-700 mb-2">Prioridade</label>
+                        <select name="priority" required class="w-full p-2 border border-gray-300 rounded-md shadow-sm focus:ring-2 focus:ring-blue-500">
+                            <option value="">Selecione a prioridade</option>
+                            {% for key, val in ticket.PRIORITY_CHOICES %}
+                                {% if key != 'A definir' %}
+                                    <option value="{{ key }}">{{ val }}</option>
+                                {% endif %}
+                            {% endfor %}
+                        </select>
+                    </div>
+                </div>
+                <div class="mt-4 flex justify-end gap-2">
+                    <button type="button" @click="showPriorityModal = false" class="bg-gray-200 px-4 py-2 rounded-md hover:bg-gray-300">Cancelar</button>
+                    <button type="submit" class="bg-blue-600 text-white px-4 py-2 rounded-md hover:bg-blue-700">Confirmar e Atender</button>
+                </div>
+            </form>
+        </div>
+    </div>
+    {% endif %}
 </div>
 {% endblock %}
 

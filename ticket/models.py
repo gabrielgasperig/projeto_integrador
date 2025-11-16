@@ -27,16 +27,18 @@ from datetime import time, timedelta
 class Ticket(models.Model):
     @staticmethod
     def calculate_sla_deadline(start, priority):
-        """Calcula o deadline de SLA somando horas úteis conforme a prioridade."""
         sla_times = {
+            'A definir': None,
             'Baixa': 72,
             'Média': 48,
             'Alta': 24,
             'Urgente': 8,
         }
-        horas = sla_times.get(priority, 48)
-        return add_working_hours(start, horas)
-    
+        hours = sla_times.get(priority, 48)
+        if hours is None:
+            return None
+        return add_working_hours(start, hours)
+
     STATUS_CHOICES = [
         ('Aberto', 'Aberto'),
         ('Em Andamento', 'Em Andamento'),
@@ -44,6 +46,7 @@ class Ticket(models.Model):
     ]
 
     PRIORITY_CHOICES = [
+        ('A definir', 'A definir'),
         ('Baixa', 'Baixa'),
         ('Média', 'Média'),
         ('Alta', 'Alta'),
@@ -55,7 +58,7 @@ class Ticket(models.Model):
     owner = models.ForeignKey(settings.AUTH_USER_MODEL, on_delete=models.CASCADE, related_name='owned_tickets')
     created_date = models.DateTimeField(auto_now_add=True)
     show = models.BooleanField(default=True)
-    priority = models.CharField(max_length=20, choices=PRIORITY_CHOICES, default='Média', verbose_name="Prioridade")
+    priority = models.CharField(max_length=20, choices=PRIORITY_CHOICES, default='A definir', verbose_name="Prioridade")
     status = models.CharField(max_length=20, choices=STATUS_CHOICES, default='Aberto')
     assigned_to = models.ForeignKey(settings.AUTH_USER_MODEL, on_delete=models.SET_NULL, null=True, blank=True, related_name='assigned_tickets')
     sla_deadline = models.DateTimeField(null=True, blank=True, verbose_name="Prazo de Resolução (SLA)")
@@ -98,7 +101,6 @@ class Ticket(models.Model):
 
     @property
     def time_to_sla(self):
-        """Calcula o tempo útil restante para o fim do prazo de SLA."""
         if not self.sla_deadline or self.status == 'Fechado':
             return None
         now = timezone.localtime(timezone.now())

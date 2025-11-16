@@ -12,11 +12,6 @@ def is_admin(user):
 
 @login_required
 def index(request):
-    """
-    Página principal da aplicação.
-    - Para Admins: Mostra a "Fila de Atendimento".
-    - Para Users Padrão: Redireciona para "Meus Tickets".
-    """
     if not request.user.is_staff:
         return redirect('ticket:my_tickets')
 
@@ -45,9 +40,6 @@ def index(request):
 @login_required
 @user_passes_test(is_admin, login_url='ticket:index')
 def all_tickets(request):
-    """
-    Página para o admin ver todos os tickets do sistema, com filtros e paginação.
-    """
     tickets_list = Ticket.objects.all()
 
     search_value = request.GET.get('q', '').strip()

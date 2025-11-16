@@ -16,4 +16,5 @@ urlpatterns = [
     path('ticket/<int:ticket_id>/assign/', ticket_views.assign_ticket, name='assign_ticket'),
     path('ticket/<int:ticket_id>/conclude/', ticket_views.conclude_ticket, name='conclude_ticket'),
     path('ticket/<int:ticket_id>/transfer/', ticket_views.transfer_ticket, name='transfer_ticket'),
+    path('ticket/<int:ticket_id>/set-priority/', ticket_views.set_priority, name='set_priority'),
 ]

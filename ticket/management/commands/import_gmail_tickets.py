@@ -45,7 +45,7 @@ class Command(BaseCommand):
             else:
                 body = base64.urlsafe_b64decode(payload['body']['data']).decode('utf-8')
             # Define prioridade padrão e calcula o SLA igual ao sistema
-            prioridade = 'Média'
+            prioridade = 'A definir'
             from django.utils import timezone
             from ticket.models import Ticket
             sla_deadline = Ticket.calculate_sla_deadline(timezone.now(), prioridade)

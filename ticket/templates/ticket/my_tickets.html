@@ -45,6 +45,7 @@
                             <td class="px-5 py-4 border-b border-gray-200 text-sm">
                                 {% with sla_status=ticket.sla_status %}
                                     <span class="px-2 py-1 rounded-md text-xs font-medium
+                                        
                                         {% if sla_status == 'No Prazo' %} bg-gray-100 text-gray-800 {% endif %}
                                         {% if sla_status == 'Atenção' %} bg-yellow-100 text-yellow-800 {% endif %}
                                         {% if sla_status == 'Violado' %} bg-red-100 text-red-800 {% endif %}

@@ -13,7 +13,14 @@ class TicketForm(forms.ModelForm):
     )
     class Meta:
         model = models.Ticket
-        fields = 'title', 'description', 'priority',
+        fields = 'title', 'description',
+
+class AdminSetPriorityForm(forms.Form):
+    priority = forms.ChoiceField(
+        choices=models.Ticket.PRIORITY_CHOICES,
+        label="Definir Prioridade",
+        required=True
+    )
 
     def clean_title(self):
         title = self.cleaned_data.get('title')

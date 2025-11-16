@@ -14,7 +14,7 @@ from django.core.paginator import Paginator
 # Importações locais
 from ..models import Ticket, TicketEvent, TicketImage
 from ..forms import (
-    TicketForm, ConcludeTicketForm, DeleteTicketForm, RatingForm, TransferTicketForm, TicketEventForm
+    TicketForm, ConcludeTicketForm, DeleteTicketForm, RatingForm, TransferTicketForm, TicketEventForm, AdminSetPriorityForm
 )
 
 @login_required
@@ -132,6 +132,8 @@ def ticket_detail(request, ticket_id):
         'rating_form': rating_form,
         'transfer_form': TransferTicketForm(current_admin=ticket.assigned_to),
         'comment_form': comment_form,
+        # Exibe formulário de prioridade apenas enquanto estiver "A definir"
+        'priority_form': AdminSetPriorityForm() if (request.user.is_staff and ticket.status != 'Fechado' and ticket.priority == 'A definir') else None,
         'site_title': 'Ticket',
     }
     return render(request, 'ticket/ticket.html', context)
@@ -195,6 +197,12 @@ def update(request, ticket_id):
         
         form.save()
 
+        if 'priority' in form.changed_data:
+            new_priority = form.cleaned_data.get('priority') or ticket.priority
+            new_deadline = Ticket.calculate_sla_deadline(timezone.now(), new_priority)
+            ticket.sla_deadline = new_deadline
+            ticket.save(update_fields=['sla_deadline'])
+
         images = request.FILES.getlist('images')
         if images:
             for img in images:
@@ -225,7 +233,7 @@ def update(request, ticket_id):
 @login_required
 def delete(request, ticket_id):
     ticket = get_object_or_404(Ticket, pk=ticket_id)
-    if not (ticket.owner == request.user or request.user.is_staff):
+    if not (ticket.owner == request.user):
         messages.error(request, 'Não tem permissão para excluir este ticket.')
         return redirect('ticket:index')
 
@@ -285,11 +293,27 @@ def assign_ticket(request, ticket_id):
         messages.error(request, 'Ação não permitida.')
         return redirect('ticket:index')
     ticket = get_object_or_404(Ticket, pk=ticket_id)
-    ticket.assigned_to = request.user
-    ticket.status = 'Em Andamento'
-    ticket.save()
-    TicketEvent.objects.create(ticket=ticket, user=request.user, event_type='STATUS', description=f"Ticket atribuído a {request.user.get_full_name()}. Status alterado para 'Em Andamento'.")
-    messages.success(request, 'Ticket em andamento.')
+    
+    if request.method == 'POST':
+        form = AdminSetPriorityForm(request.POST)
+        if form.is_valid():
+            priority = form.cleaned_data['priority']
+            ticket.assigned_to = request.user
+            ticket.status = 'Em Andamento'
+            ticket.priority = priority
+            ticket.sla_deadline = Ticket.calculate_sla_deadline(timezone.now(), priority)
+            ticket.save()
+            TicketEvent.objects.create(
+                ticket=ticket, 
+                user=request.user, 
+                event_type='STATUS', 
+                description=f"Ticket atribuído a {request.user.get_full_name()}. Status alterado para 'Em Andamento'. Prioridade definida como '{priority}'."
+            )
+            messages.success(request, 'Ticket em andamento.')
+            return redirect('ticket:ticket_detail', ticket_id=ticket.id)
+        else:
+            messages.error(request, 'É necessário definir a prioridade para atender o ticket.')
+    
     return redirect('ticket:ticket_detail', ticket_id=ticket.id)
 
 @login_required
@@ -316,6 +340,37 @@ def transfer_ticket(request, ticket_id):
             )
             messages.success(request, f'Ticket transferido para {new_admin.get_full_name()}.')
     
+    return redirect('ticket:ticket_detail', ticket_id=ticket.id)
+
+@login_required
+def set_priority(request, ticket_id):
+    ticket = get_object_or_404(Ticket, pk=ticket_id)
+    if not request.user.is_staff:
+        messages.error(request, 'Ação não permitida.')
+        return redirect('ticket:ticket_detail', ticket_id=ticket.id)
+    
+    # Bloqueia alteração se já definida ou ticket fechado
+    if ticket.status == 'Fechado' or ticket.priority != 'A definir':
+        messages.error(request, 'Prioridade já definida ou ticket fechado; não é possível alterar.')
+        return redirect('ticket:ticket_detail', ticket_id=ticket.id)
+
+    if request.method == 'POST':
+        form = AdminSetPriorityForm(request.POST)
+        if form.is_valid():
+            new_priority = form.cleaned_data['priority']
+            ticket.priority = new_priority
+            ticket.sla_deadline = Ticket.calculate_sla_deadline(timezone.now(), new_priority)
+            ticket.save(update_fields=['priority', 'sla_deadline'])
+            TicketEvent.objects.create(
+                ticket=ticket,
+                user=request.user,
+                event_type='STATUS',
+                description=f"Prioridade alterada para: {new_priority}."
+            )
+            messages.success(request, 'Prioridade atualizada e SLA recalculado.')
+        else:
+            messages.error(request, 'Selecione uma prioridade válida.')
+
     return redirect('ticket:ticket_detail', ticket_id=ticket.id)
 
 @login_required

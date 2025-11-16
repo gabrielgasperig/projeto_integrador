@@ -37,13 +37,6 @@
                     {% endfor %}
                 </div>
                 <div>
-                    <label for="{{ form.priority.id_for_label }}" class="block text-sm font-medium text-gray-700">{{ form.priority.label }}</label>
-                    {% render_field form.priority class="mt-1 block w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-2 focus:ring-blue-500" %}
-                    {% for error in form.priority.errors %}
-                        <p class="mt-1 text-xs text-red-600">{{ error }}</p>
-                    {% endfor %}
-                </div>
-                <div>
                     <label for="{{ form.description.id_for_label }}" class="block text-sm font-medium text-gray-700">{{ form.description.label }}</label>
                     {% render_field form.description class="mt-1 block w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-2 focus:ring-blue-500" rows="4" placeholder="Descreva o problema com o máximo de detalhes possível..." %}
                     {% for error in form.description.errors %}
