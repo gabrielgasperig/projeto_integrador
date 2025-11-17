@@ -11,14 +11,18 @@
             <div class="mt-4 flex flex-wrap items-center justify-between gap-y-2 text-sm">
                 
                 <div class="flex flex-wrap items-center gap-x-6 gap-y-2">
+                    {% if ticket.category %}
                     <span class="font-semibold flex items-center gap-2">
-                        Status: 
-                        <span class="px-2 py-1 rounded-md text-xs font-medium
-                            {% if ticket.status == 'Aberto' %} bg-blue-100 text-blue-800 {% endif %}
-                            {% if ticket.status == 'Em Andamento' %} bg-yellow-100 text-yellow-800 {% endif %}
-                            {% if ticket.status == 'Fechado' %} bg-green-100 text-green-800 {% endif %}
-                        ">{{ ticket.status }}</span>
+                        Categoria: 
+                        <span class="px-2 py-1 rounded-md text-xs font-medium bg-blue-100 text-blue-800">{{ ticket.category.name }}</span>
                     </span>
+                    {% endif %}
+                    {% if ticket.subcategory %}
+                    <span class="font-semibold flex items-center gap-2">
+                        Subcategoria: 
+                        <span class="px-2 py-1 rounded-md text-xs font-medium bg-blue-100 text-blue-800">{{ ticket.subcategory.name }}</span>
+                    </span>
+                    {% endif %}
                     <span class="font-semibold flex items-center gap-2">Prioridade: 
                         <span class="px-2 py-1 rounded-md text-xs font-medium
                             {% if ticket.priority == 'Baixa' %} bg-gray-100 text-gray-800 {% endif %}
@@ -29,10 +33,17 @@
                             {{ ticket.get_priority_display }}
                         </span>
                     </span>
+                    <span class="font-semibold flex items-center gap-2">
+                        Status: 
+                        <span class="px-2 py-1 rounded-md text-xs font-medium
+                            {% if ticket.status == 'Aberto' %} bg-blue-100 text-blue-800 {% endif %}
+                            {% if ticket.status == 'Em Andamento' %} bg-yellow-100 text-yellow-800 {% endif %}
+                            {% if ticket.status == 'Fechado' %} bg-green-100 text-green-800 {% endif %}
+                        ">{{ ticket.status }}</span>
+                    </span>
                      {% if ticket.sla_deadline %}
                     <span class="font-semibold flex items-center gap-2">
                         Prazo SLA:
-                        <span class="px-2 py-1 rounded-md text-xs font-medium">{{ ticket.sla_deadline|date:"d/m/Y H:i" }}</span>
                         {% with sla_status=ticket.sla_status %}
                             <span class="px-2 py-1 rounded-md text-xs font-medium
                                 {% if sla_status == 'No Prazo' %} bg-gray-100 text-gray-800 {% endif %}
