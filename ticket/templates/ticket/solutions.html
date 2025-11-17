@@ -6,8 +6,48 @@
         <h1 class="text-2xl md:text-3xl font-bold text-gray-800">Banco de Soluções</h1>
     </div>
 
-    <form action="" method="GET" class="flex flex-col sm:flex-row items-end gap-3 mb-6 w-full">
-        <input type="search" placeholder="Buscar solução..." class="bg-white border border-gray-300 rounded-md px-3 py-2 focus:outline-none focus:ring-2 focus:ring-blue-500 w-full sm:flex-auto" id="search" name="q" value="{{ search_value }}">
+    <form action="" method="GET" class="flex flex-col sm:flex-row items-end gap-3 mb-6 w-full" id="filterForm">
+        <div class="w-full">
+            <label for="search" class="text-xs text-gray-500">Buscar:</label>
+            <input type="search" placeholder="Buscar solução..." class="bg-white border border-gray-300 rounded-md px-3 py-1.5 focus:outline-none focus:ring-2 focus:ring-blue-500 w-full" id="search" name="q" value="{{ search_value }}">
+        </div>
+        
+        <div class="w-full">
+            <label for="categorySelect" class="text-xs text-gray-500">Categoria:</label>
+            <select name="category" id="categorySelect" class="bg-white border border-gray-300 rounded-md px-3 py-1.5 focus:outline-none focus:ring-2 focus:ring-blue-500 w-full">
+                <option value="">Todas as Categorias</option>
+                {% for category in categories %}
+                    <option value="{{ category.id }}" {% if request.GET.category == category.id|stringformat:"s" %}selected{% endif %}>
+                        {{ category.name }}
+                    </option>
+                {% endfor %}
+            </select>
+        </div>
+        
+        <div class="w-full">
+            <label for="subcategorySelect" class="text-xs text-gray-500">Subcategoria:</label>
+            <select name="subcategory" id="subcategorySelect" class="bg-white border border-gray-300 rounded-md px-3 py-1.5 focus:outline-none focus:ring-2 focus:ring-blue-500 w-full">
+                <option value="">Todas as Subcategorias</option>
+                {% for subcategory in subcategories %}
+                    <option value="{{ subcategory.id }}" data-category="{{ subcategory.category.id }}" {% if request.GET.subcategory == subcategory.id|stringformat:"s" %}selected{% endif %}>
+                        {{ subcategory.category.name }} - {{ subcategory.name }}
+                    </option>
+                {% endfor %}
+            </select>
+        </div>
+        
+        <div class="w-full">
+            <label for="rating" class="text-xs text-gray-500">Avaliação:</label>
+            <select name="rating" id="rating" class="bg-white border border-gray-300 rounded-md px-3 py-1.5 focus:outline-none focus:ring-2 focus:ring-blue-500 w-full">
+                <option value="">Todas as Avaliações</option>
+                <option value="5" {% if request.GET.rating == "5" %}selected{% endif %}>⭐⭐⭐⭐⭐</option>
+                <option value="4" {% if request.GET.rating == "4" %}selected{% endif %}>⭐⭐⭐⭐</option>
+                <option value="3" {% if request.GET.rating == "3" %}selected{% endif %}>⭐⭐⭐</option>
+                <option value="2" {% if request.GET.rating == "2" %}selected{% endif %}>⭐⭐</option>
+                <option value="1" {% if request.GET.rating == "1" %}selected{% endif %}>⭐</option>
+            </select>
+        </div>
+        
         <div class="w-full">
             <label for="start_date" class="text-xs text-gray-500">De:</label>
             <input type="date" name="start_date" id="start_date" value="{{ start_date }}" class="bg-white border border-gray-300 rounded-md px-3 py-1.5 focus:outline-none focus:ring-2 focus:ring-blue-500 w-full">
@@ -26,40 +66,78 @@
                 <thead>
                     <tr>
                         <th class="px-5 py-3 border-b-2 border-gray-200 bg-gray-100 text-left text-xs font-semibold text-gray-600 uppercase tracking-wider">
-                            <a href="?sort={% if request.GET.sort == 'title' %}-title{% else %}title{% endif %}&q={{ search_value }}&start_date={{ start_date }}&end_date={{ end_date }}" class="hover:text-gray-900">Título</a>
+                            <a href="?sort={% if request.GET.sort == 'title' %}-title{% else %}title{% endif %}&q={{ search_value }}&category={{ request.GET.category }}&subcategory={{ request.GET.subcategory }}&rating={{ request.GET.rating }}&start_date={{ start_date }}&end_date={{ end_date }}" class="hover:text-gray-900">Título</a>
+                        </th>
+                        <th class="px-5 py-3 border-b-2 border-gray-200 bg-gray-100 text-left text-xs font-semibold text-gray-600 uppercase tracking-wider">
+                            <a href="?sort={% if request.GET.sort == 'category' %}-category{% else %}category{% endif %}&q={{ search_value }}&category={{ request.GET.category }}&subcategory={{ request.GET.subcategory }}&rating={{ request.GET.rating }}&start_date={{ start_date }}&end_date={{ end_date }}" class="hover:text-gray-900">Categoria</a>
+                        </th>
+                        <th class="px-5 py-3 border-b-2 border-gray-200 bg-gray-100 text-left text-xs font-semibold text-gray-600 uppercase tracking-wider">
+                            <a href="?sort={% if request.GET.sort == 'subcategory' %}-subcategory{% else %}subcategory{% endif %}&q={{ search_value }}&category={{ request.GET.category }}&subcategory={{ request.GET.subcategory }}&rating={{ request.GET.rating }}&start_date={{ start_date }}&end_date={{ end_date }}" class="hover:text-gray-900">Subcategoria</a>
                         </th>
                         <th class="px-5 py-3 border-b-2 border-gray-200 bg-gray-100 text-left text-xs font-semibold text-gray-600 uppercase tracking-wider">Descrição</th>
+                        <th class="px-5 py-3 border-b-2 border-gray-200 bg-gray-100 text-left text-xs font-semibold text-gray-600 uppercase tracking-wider">Solução Aplicada</th>
                         <th class="px-5 py-3 border-b-2 border-gray-200 bg-gray-100 text-left text-xs font-semibold text-gray-600 uppercase tracking-wider">
-                            <a href="?sort={% if request.GET.sort == '-closed_date' %}closed_date{% else %}-closed_date{% endif %}&q={{ search_value }}&start_date={{ start_date }}&end_date={{ end_date }}" class="hover:text-gray-900">Data de Resolução</a>
+                            <a href="?sort={% if request.GET.sort == '-closed_date' %}closed_date{% else %}-closed_date{% endif %}&q={{ search_value }}&category={{ request.GET.category }}&subcategory={{ request.GET.subcategory }}&rating={{ request.GET.rating }}&start_date={{ start_date }}&end_date={{ end_date }}" class="hover:text-gray-900">Data de Resolução</a>
                         </th>
                         <th class="px-5 py-3 border-b-2 border-gray-200 bg-gray-100 text-left text-xs font-semibold text-gray-600 uppercase tracking-wider">Responsável</th>
-                        <th class="px-5 py-3 border-b-2 border-gray-200 bg-gray-100 text-left text-xs font-semibold text-gray-600 uppercase tracking-wider">Solução Aplicada</th>
+                        <th class="px-5 py-3 border-b-2 border-gray-200 bg-gray-100 text-left text-xs font-semibold text-gray-600 uppercase tracking-wider">
+                            <a href="?sort={% if request.GET.sort == 'rating' %}-rating{% else %}rating{% endif %}&q={{ search_value }}&category={{ request.GET.category }}&subcategory={{ request.GET.subcategory }}&rating={{ request.GET.rating }}&start_date={{ start_date }}&end_date={{ end_date }}" class="hover:text-gray-900">Avaliação</a>
+                        </th>
                     </tr>
                 </thead>
                 <tbody>
                     {% for ticket in page_obj %}
                         <tr class="hover:bg-gray-50">
                             <td class="px-5 py-4 border-b border-gray-200 text-sm">
-                                <a href="{% url 'ticket:ticket_detail' ticket.id %}" class="text-blue-600 hover:text-blue-900 font-semibold">{{ ticket.title }}</a>
+                                <a href="{% url 'ticket:ticket_detail' ticket.id %}" class="text-sm text-blue-600 hover:text-blue-900 font-semibold">{{ ticket.title }}</a>
                             </td>
                             <td class="px-5 py-4 border-b border-gray-200 text-sm">
-                                <span class="block text-gray-700">{{ ticket.description|truncatechars:100 }}</span>
+                                {% if ticket.category %}
+                                    <span class="px-2 py-1 rounded-md text-sm font-medium bg-blue-100 text-blue-800">
+                                        {{ ticket.category.name }}
+                                    </span>
+                                {% else %}
+                                    <span class="text-sm text-gray-500">Sem categoria</span>
+                                {% endif %}
                             </td>
-                            <td class="px-5 py-4 border-b border-gray-200 text-sm">{{ ticket.closed_date|date:"d/m/Y H:i" }}</td>
-                            <td class="px-5 py-4 border-b border-gray-200 text-sm">{{ ticket.assigned_to.first_name }} {{ ticket.assigned_to.last_name }}</td>
+                            <td class="px-5 py-4 border-b border-gray-200 text-sm">
+                                {% if ticket.subcategory %}
+                                    <span class="px-2 py-1 rounded-md text-sm font-medium bg-blue-100 text-blue-800">
+                                        {{ ticket.subcategory.name }}
+                                    </span>
+                                {% else %}
+                                    <span class="text-sm text-gray-500">Sem subcategoria</span>
+                                {% endif %}
+                            </td>
+                            <td class="px-5 py-4 border-b border-gray-200 text-sm">
+                                <span class="text-sm text-gray-700">{{ ticket.description|truncatechars:100 }}</span>
+                            </td>
                             <td class="px-5 py-4 border-b border-gray-200 text-sm">
                                 {% with conclusion=ticket.conclusion_events.0 %}
                                     {% if conclusion %}
-                                        <span class="block text-gray-700">{{ conclusion.description }}</span>
+                                        <span class="text-sm text-gray-700">{{ conclusion.description|truncatechars:100 }}</span>
                                     {% else %}
-                                        <span class="block text-yellow-700">Ainda não há uma solução registrada para este ticket.</span>
+                                        <span class="text-sm text-yellow-700">Ainda não há uma solução registrada para este ticket.</span>
                                     {% endif %}
                                 {% endwith %}
+                            </td>
+                            <td class="px-5 py-4 border-b border-gray-200 text-sm">
+                                <span class="text-sm">{{ ticket.closed_date|date:"d/m/Y H:i" }}</span>
+                            </td>
+                            <td class="px-5 py-4 border-b border-gray-200 text-sm">
+                                <span class="text-sm">{{ ticket.assigned_to.first_name }} {{ ticket.assigned_to.last_name }}</span>
+                            </td>
+                            <td class="px-5 py-4 border-b border-gray-200 text-sm">
+                                {% if ticket.rating %}
+                                    <span class="text-sm text-yellow-500">{{ ticket.get_rating_display }}</span>
+                                {% else %}
+                                    <span class="px-2 py-1 rounded-md text-sm font-medium bg-orange-100 text-orange-800">Pendente de Avaliação</span>
+                                {% endif %}
                             </td>
                         </tr>
                     {% empty %}
                         <tr>
-                            <td colspan="5" class="text-center py-10 text-gray-500">Nenhuma solução encontrada.</td>
+                            <td colspan="8" class="text-center py-10 text-gray-500">Nenhuma solução encontrada.</td>
                         </tr>
                     {% endfor %}
                 </tbody>
@@ -69,4 +147,7 @@
 
     {% include 'global/partials/_pagination.html' %}
 </div>
+
+{% load static %}
+<script src="{% static 'global/js/category-filter.js' %}"></script>
 {% endblock content %}

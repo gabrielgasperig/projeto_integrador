@@ -1,6 +1,6 @@
 from django.shortcuts import render
 from django.contrib.auth.decorators import login_required
-from ticket.models import Ticket
+from ticket.models import Ticket, Category, Subcategory
 from django.db.models import Count, Avg, F, Q, ExpressionWrapper, DurationField
 from django.utils import timezone
 from django.contrib.auth.models import User
@@ -15,6 +15,7 @@ def index(request):
     filters = Q()
     category = request.GET.get('category')
     subcategory = request.GET.get('subcategory')
+    rating = request.GET.get('rating')
     if start_date:
         filters &= Q(created_date__gte=start_date)
     if end_date:
@@ -27,6 +28,8 @@ def index(request):
         filters &= Q(category_id=category)
     if subcategory:
         filters &= Q(subcategory_id=subcategory)
+    if rating:
+        filters &= Q(rating=rating)
 
     tickets = Ticket.objects.filter(filters)
     total_tickets = tickets.count()
@@ -68,6 +71,9 @@ def index(request):
 
     agents = User.objects.filter(is_active=True, is_staff=True).order_by('first_name', 'last_name')
     priorities = Ticket._meta.get_field('priority').choices
+    categories = Category.objects.all().order_by('name')
+    subcategories = Subcategory.objects.all().order_by('category__name', 'name')
+    ratings = Ticket.RATING_CHOICES
 
     context = {
         'total_tickets': total_tickets,
@@ -86,5 +92,8 @@ def index(request):
         'site_title': 'Dashboard de Estatísticas',
         'agents': agents,
         'priorities': priorities,
+        'categories': categories,
+        'subcategories': subcategories,
+        'ratings': ratings,
     }
     return render(request, 'statistician/index.html', context)

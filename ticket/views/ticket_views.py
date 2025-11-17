@@ -269,7 +269,7 @@ def conclude_ticket(request, ticket_id):
             ticket.save()
             TicketEvent.objects.create(
                 ticket=ticket, user=request.user, event_type='CONCLUSÃO', 
-                description=f"Solução: {solution}"
+                description=f"{solution}"
             )
             if ticket.assigned_to == request.user:
                 notify_ticket_owner(
@@ -382,6 +382,9 @@ def solutions(request):
         messages.error(request, 'Acesso negado. Você não tem permissão para acessar esta página.')
         return redirect('ticket:my_tickets')
     query = request.GET.get('q', '')
+    category_filter = request.GET.get('category', '')
+    subcategory_filter = request.GET.get('subcategory', '')
+    rating_filter = request.GET.get('rating', '')
     start_date = request.GET.get('start_date', '')
     end_date = request.GET.get('end_date', '')
     sort = request.GET.get('sort', '-closed_date')
@@ -398,6 +401,13 @@ def solutions(request):
             Q(assigned_to__last_name__icontains=query)
         ).distinct()
 
+    if category_filter:
+        resolved_tickets_list = resolved_tickets_list.filter(category_id=category_filter)
+    if subcategory_filter:
+        resolved_tickets_list = resolved_tickets_list.filter(subcategory_id=subcategory_filter)
+    if rating_filter:
+        resolved_tickets_list = resolved_tickets_list.filter(rating=rating_filter)
+
     if start_date:
         resolved_tickets_list = resolved_tickets_list.filter(closed_date__gte=start_date)
 
@@ -405,7 +415,7 @@ def solutions(request):
         end_date_dt = datetime.strptime(end_date, '%Y-%m-%d') + timedelta(days=1)
         resolved_tickets_list = resolved_tickets_list.filter(closed_date__lt=end_date_dt)
 
-    allowed_sorts = ['title', '-title', 'closed_date', '-closed_date']
+    allowed_sorts = ['title', '-title', 'closed_date', '-closed_date', 'category', '-category', 'subcategory', '-subcategory', 'rating', '-rating']
     if sort in allowed_sorts:
         resolved_tickets_list = resolved_tickets_list.order_by(sort)
     else:
@@ -415,9 +425,15 @@ def solutions(request):
     page_number = request.GET.get('page')
     page_obj = paginator.get_page(page_number)
 
+    from ..models import Category, Subcategory
+    categories = Category.objects.all().order_by('name')
+    subcategories = Subcategory.objects.all().order_by('category__name', 'name')
+
     context = {
         'site_title': 'Banco de Soluções',
         'page_obj': page_obj,
+        'categories': categories,
+        'subcategories': subcategories,
         'search_value': query,
         'start_date': start_date,
         'end_date': end_date,

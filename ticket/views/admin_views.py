@@ -45,6 +45,8 @@ def all_tickets(request):
     search_value = request.GET.get('q', '').strip()
     status_filter = request.GET.get('status', '')
     priority_filter = request.GET.get('priority', '')
+    category_filter = request.GET.get('category', '')
+    subcategory_filter = request.GET.get('subcategory', '')
     start_date_str = request.GET.get('start_date', '')
     end_date_str = request.GET.get('end_date', '')
     sort_by = request.GET.get('sort', '-id')
@@ -60,6 +62,10 @@ def all_tickets(request):
         tickets_list = tickets_list.filter(status__iexact=status_filter)
     if priority_filter:
         tickets_list = tickets_list.filter(priority__iexact=priority_filter)
+    if category_filter:
+        tickets_list = tickets_list.filter(category_id=category_filter)
+    if subcategory_filter:
+        tickets_list = tickets_list.filter(subcategory_id=subcategory_filter)
 
     if start_date_str:
         try:
@@ -82,11 +88,17 @@ def all_tickets(request):
     page_number = request.GET.get('page')
     page_obj = paginator.get_page(page_number)
 
+    from ..models import Category, Subcategory
+    categories = Category.objects.all().order_by('name')
+    subcategories = Subcategory.objects.all().order_by('category__name', 'name')
+
     context = {
         'site_title': 'Todos os Tickets',
         'page_obj': page_obj,
         'status_choices': Ticket.STATUS_CHOICES,
         'priorities': Ticket.PRIORITY_CHOICES,
+        'categories': categories,
+        'subcategories': subcategories,
         'search_value': search_value,
         'start_date': start_date_str,
         'end_date': end_date_str,

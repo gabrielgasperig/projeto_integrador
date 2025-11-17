@@ -18,6 +18,12 @@
                                 <a href="?sort_unassigned={% if current_sort_unassigned == 'title' %}-title{% else %}title{% endif %}" class="hover:text-gray-900">Título</a>
                             </th>
                             <th class="px-5 py-3 border-b-2 border-gray-200 bg-gray-100 text-left text-xs font-semibold text-gray-600 uppercase tracking-wider">
+                                <a href="?sort_unassigned={% if current_sort_unassigned == 'category' %}-category{% else %}category{% endif %}" class="hover:text-gray-900">Categoria</a>
+                            </th>
+                            <th class="px-5 py-3 border-b-2 border-gray-200 bg-gray-100 text-left text-xs font-semibold text-gray-600 uppercase tracking-wider">
+                                <a href="?sort_unassigned={% if current_sort_unassigned == 'subcategory' %}-subcategory{% else %}subcategory{% endif %}" class="hover:text-gray-900">Subcategoria</a>
+                            </th>
+                            <th class="px-5 py-3 border-b-2 border-gray-200 bg-gray-100 text-left text-xs font-semibold text-gray-600 uppercase tracking-wider">
                                 <a href="?sort_unassigned={% if current_sort_unassigned == 'owner' %}-owner{% else %}owner{% endif %}" class="hover:text-gray-900">Criado por</a>
                             </th>
                             <th class="px-5 py-3 border-b-2 border-gray-200 bg-gray-100 text-left text-xs font-semibold text-gray-600 uppercase tracking-wider">
@@ -38,19 +44,41 @@
                         {% for ticket in unassigned_tickets %}
                             <tr class="hover:bg-gray-50">
                                 <td class="px-5 py-4 border-b border-gray-200 text-sm">
-                                    <a href="{% url 'ticket:ticket_detail' ticket.id %}" class="text-blue-600 hover:text-blue-900 font-semibold">{{ ticket.title }}</a>
+                                    <a href="{% url 'ticket:ticket_detail' ticket.id %}" class="text-sm text-blue-600 hover:text-blue-900 font-semibold">{{ ticket.title }}</a>
                                 </td>
-                                <td class="px-5 py-4 border-b border-gray-200 text-sm">{{ ticket.owner.first_name }} {{ ticket.owner.last_name }}</td>
-                                <td class="px-5 py-4 border-b border-gray-200 text-sm">{{ ticket.created_date|date:"d/m/Y H:i" }}</td>
                                 <td class="px-5 py-4 border-b border-gray-200 text-sm">
-                                    <span class="px-2 py-1 rounded-md text-xs font-medium
+                                    {% if ticket.category %}
+                                        <span class="px-2 py-1 rounded-md text-sm font-medium bg-blue-100 text-blue-800">
+                                            {{ ticket.category.name }}
+                                        </span>
+                                    {% else %}
+                                        <span class="text-sm text-gray-500">Sem categoria</span>
+                                    {% endif %}
+                                </td>
+                                <td class="px-5 py-4 border-b border-gray-200 text-sm">
+                                    {% if ticket.subcategory %}
+                                        <span class="px-2 py-1 rounded-md text-sm font-medium bg-blue-100 text-blue-800">
+                                            {{ ticket.subcategory.name }}
+                                        </span>
+                                    {% else %}
+                                        <span class="text-sm text-gray-500">Sem subcategoria</span>
+                                    {% endif %}
+                                </td>
+                                <td class="px-5 py-4 border-b border-gray-200 text-sm">
+                                    <span class="text-sm">{{ ticket.owner.first_name }} {{ ticket.owner.last_name }}</span>
+                                </td>
+                                <td class="px-5 py-4 border-b border-gray-200 text-sm">
+                                    <span class="text-sm">{{ ticket.created_date|date:"d/m/Y H:i" }}</span>
+                                </td>
+                                <td class="px-5 py-4 border-b border-gray-200 text-sm">
+                                    <span class="px-2 py-1 rounded-md text-sm font-medium
                                         {% if ticket.status == 'Aberto' %} bg-blue-100 text-blue-800 {% endif %}
                                         {% if ticket.status == 'Em Andamento' %} bg-yellow-100 text-yellow-800 {% endif %}
                                         {% if ticket.status == 'Fechado' %} bg-green-100 text-green-800 {% endif %}
                                     ">{{ ticket.status }}</span>
                                 </td>
                                 <td class="px-5 py-4 border-b border-gray-200 text-sm">
-                                    <span class="px-2 py-1 rounded-md text-xs font-medium
+                                    <span class="px-2 py-1 rounded-md text-sm font-medium
                                         {% if ticket.priority == 'Baixa' %} bg-gray-100 text-gray-800 {% endif %}
                                         {% if ticket.priority == 'Média' %} bg-yellow-100 text-yellow-800 {% endif %}
                                         {% if ticket.priority == 'Alta' %} bg-orange-100 text-orange-800 {% endif %}
@@ -59,7 +87,7 @@
                                 </td>
                                 <td class="px-5 py-4 border-b border-gray-200 text-sm">
                                     {% with sla_status=ticket.sla_status %}
-                                        <span class="px-2 py-1 rounded-md text-xs font-medium
+                                        <span class="px-2 py-1 rounded-md text-sm font-medium
                                             {% if sla_status == 'No Prazo' %} bg-gray-100 text-gray-800 {% endif %}
                                             {% if sla_status == 'Atenção' %} bg-yellow-100 text-yellow-800 {% endif %}
                                             {% if sla_status == 'Violado' %} bg-red-100 text-red-800 {% endif %}
@@ -72,7 +100,7 @@
                             </tr>
                         {% empty %}
                             <tr>
-                                <td colspan="7" class="text-center py-10 text-gray-500">Nenhum ticket encontrado.</td>
+                                <td colspan="8" class="text-center py-10 text-gray-500">Nenhum ticket encontrado.</td>
                             </tr>
                         {% endfor %}
                     </tbody>
@@ -95,6 +123,12 @@
                                 <a href="?sort_assigned={% if current_sort_assigned == 'title' %}-title{% else %}title{% endif %}" class="hover:text-gray-900">Título</a>
                             </th>
                             <th class="px-5 py-3 border-b-2 border-gray-200 bg-gray-100 text-left text-xs font-semibold text-gray-600 uppercase tracking-wider">
+                                <a href="?sort_assigned={% if current_sort_assigned == 'category' %}-category{% else %}category{% endif %}" class="hover:text-gray-900">Categoria</a>
+                            </th>
+                            <th class="px-5 py-3 border-b-2 border-gray-200 bg-gray-100 text-left text-xs font-semibold text-gray-600 uppercase tracking-wider">
+                                <a href="?sort_assigned={% if current_sort_assigned == 'subcategory' %}-subcategory{% else %}subcategory{% endif %}" class="hover:text-gray-900">Subcategoria</a>
+                            </th>
+                            <th class="px-5 py-3 border-b-2 border-gray-200 bg-gray-100 text-left text-xs font-semibold text-gray-600 uppercase tracking-wider">
                                 <a href="?sort_assigned={% if current_sort_assigned == 'owner' %}-owner{% else %}owner{% endif %}" class="hover:text-gray-900">Criado por</a>
                             </th>
                             <th class="px-5 py-3 border-b-2 border-gray-200 bg-gray-100 text-left text-xs font-semibold text-gray-600 uppercase tracking-wider">
@@ -115,19 +149,41 @@
                         {% for ticket in assigned_to_me %}
                             <tr class="hover:bg-gray-50">
                                 <td class="px-5 py-4 border-b border-gray-200 text-sm">
-                                    <a href="{% url 'ticket:ticket_detail' ticket.id %}" class="text-blue-600 hover:text-blue-900 font-semibold">{{ ticket.title }}</a>
+                                    <a href="{% url 'ticket:ticket_detail' ticket.id %}" class="text-sm text-blue-600 hover:text-blue-900 font-semibold">{{ ticket.title }}</a>
                                 </td>
-                                <td class="px-5 py-4 border-b border-gray-200 text-sm">{{ ticket.owner.first_name }} {{ ticket.owner.last_name }}</td>
-                                <td class="px-5 py-4 border-b border-gray-200 text-sm">{{ ticket.created_date|date:"d/m/Y H:i" }}</td>
                                 <td class="px-5 py-4 border-b border-gray-200 text-sm">
-                                    <span class="px-2 py-1 rounded-md text-xs font-medium
+                                    {% if ticket.category %}
+                                        <span class="px-2 py-1 rounded-md text-sm font-medium bg-blue-100 text-blue-800">
+                                            {{ ticket.category.name }}
+                                        </span>
+                                    {% else %}
+                                        <span class="text-sm text-gray-500">Sem categoria</span>
+                                    {% endif %}
+                                </td>
+                                <td class="px-5 py-4 border-b border-gray-200 text-sm">
+                                    {% if ticket.subcategory %}
+                                        <span class="px-2 py-1 rounded-md text-sm font-medium bg-blue-100 text-blue-800">
+                                            {{ ticket.subcategory.name }}
+                                        </span>
+                                    {% else %}
+                                        <span class="text-sm text-gray-500">Sem subcategoria</span>
+                                    {% endif %}
+                                </td>
+                                <td class="px-5 py-4 border-b border-gray-200 text-sm">
+                                    <span class="text-sm">{{ ticket.owner.first_name }} {{ ticket.owner.last_name }}</span>
+                                </td>
+                                <td class="px-5 py-4 border-b border-gray-200 text-sm">
+                                    <span class="text-sm">{{ ticket.created_date|date:"d/m/Y H:i" }}</span>
+                                </td>
+                                <td class="px-5 py-4 border-b border-gray-200 text-sm">
+                                    <span class="px-2 py-1 rounded-md text-sm font-medium
                                         {% if ticket.status == 'Aberto' %} bg-blue-100 text-blue-800 {% endif %}
                                         {% if ticket.status == 'Em Andamento' %} bg-yellow-100 text-yellow-800 {% endif %}
                                         {% if ticket.status == 'Fechado' %} bg-green-100 text-green-800 {% endif %}
                                     ">{{ ticket.status }}</span>
                                 </td>
                                 <td class="px-5 py-4 border-b border-gray-200 text-sm">
-                                    <span class="px-2 py-1 rounded-md text-xs font-medium
+                                    <span class="px-2 py-1 rounded-md text-sm font-medium
                                         {% if ticket.priority == 'Baixa' %} bg-gray-100 text-gray-800 {% endif %}
                                         {% if ticket.priority == 'Média' %} bg-yellow-100 text-yellow-800 {% endif %}
                                         {% if ticket.priority == 'Alta' %} bg-orange-100 text-orange-800 {% endif %}
@@ -136,7 +192,7 @@
                                 </td>
                                 <td class="px-5 py-4 border-b border-gray-200 text-sm">
                                     {% with sla_status=ticket.sla_status %}
-                                        <span class="px-2 py-1 rounded-md text-xs font-medium
+                                        <span class="px-2 py-1 rounded-md text-sm font-medium
                                             {% if sla_status == 'No Prazo' %} bg-gray-100 text-gray-800 {% endif %}
                                             {% if sla_status == 'Atenção' %} bg-yellow-100 text-yellow-800 {% endif %}
                                             {% if sla_status == 'Violado' %} bg-red-100 text-red-800 {% endif %}
@@ -149,7 +205,7 @@
                             </tr>
                         {% empty %}
                             <tr>
-                                <td colspan="7" class="text-center py-10 text-gray-500">Nenhum ticket atribuído a você.</td>
+                                <td colspan="8" class="text-center py-10 text-gray-500">Nenhum ticket atribuído a você.</td>
                             </tr>
                         {% endfor %}
                     </tbody>

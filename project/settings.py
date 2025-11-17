@@ -139,8 +139,8 @@ STATIC_ROOT = BASE_DIR / 'static'
 MEDIA_URL = 'media/'
 MEDIA_ROOT = BASE_DIR / 'media'
 
-
-# Configurações de e-mail para envio via Gmail SMTP
+# Email Configuration
+# https://docs.djangoproject.com/en/5.2/topics/email/
 EMAIL_BACKEND = 'django.core.mail.backends.smtp.EmailBackend'
 EMAIL_HOST = 'smtp.gmail.com'
 EMAIL_PORT = 587
@@ -158,7 +158,6 @@ MESSAGE_TAGS = {
     messages.ERROR: 'red',
 }
 
-# URL de redirecionamento quando o login é necessário
 LOGIN_URL = '/account/login/'
 LOGIN_REDIRECT_URL = '/ticket/'
 LOGOUT_REDIRECT_URL = '/'
