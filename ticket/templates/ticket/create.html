@@ -29,6 +29,30 @@
             {% endif %}
 
             <div class="space-y-4">
+                {% if form.fields.category.widget.input_type != 'hidden' %}
+                <div id="category-field">
+                    <label for="{{ form.category.id_for_label }}" class="block text-sm font-medium text-gray-700">
+                        {{ form.category.label }}
+                        {% if form.fields.category.required %}<span class="text-red-600">*</span>{% endif %}
+                    </label>
+                    {% render_field form.category class="mt-1 block w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-2 focus:ring-blue-500" id="id_category" %}
+                    {% for error in form.category.errors %}
+                        <p class="mt-1 text-xs text-red-600">{{ error }}</p>
+                    {% endfor %}
+                </div>
+                {% endif %}
+                
+                <div id="subcategory-field" style="display: none;">
+                    <label for="{{ form.subcategory.id_for_label }}" class="block text-sm font-medium text-gray-700">
+                        {{ form.subcategory.label }}
+                        <span class="text-red-600" id="subcategory-required">*</span>
+                    </label>
+                    {% render_field form.subcategory class="mt-1 block w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-2 focus:ring-blue-500" id="id_subcategory" %}
+                    {% for error in form.subcategory.errors %}
+                        <p class="mt-1 text-xs text-red-600">{{ error }}</p>
+                    {% endfor %}
+                </div>
+                
                 <div>
                     <label for="{{ form.title.id_for_label }}" class="block text-sm font-medium text-gray-700">{{ form.title.label }}</label>
                     {% render_field form.title class="mt-1 block w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-2 focus:ring-blue-500" placeholder="Ex: Problema com impressora" %}
@@ -65,4 +89,68 @@
         </form>
     </div>
 </div>
+
+<script>
+document.addEventListener('DOMContentLoaded', function() {
+    const categorySelect = document.getElementById('id_category');
+    const subcategoryField = document.getElementById('subcategory-field');
+    const subcategorySelect = document.getElementById('id_subcategory');
+    const subcategoryRequired = document.getElementById('subcategory-required');
+    
+    // Data de subcategorias por categoria (gerado pelo Django)
+    const subcategoriesByCategory = {
+        {% for category in form.fields.category.queryset %}
+            {{ category.id }}: [
+                {% for subcat in category.subcategories.all %}
+                    { id: {{ subcat.id }}, name: "{{ subcat.name|escapejs }}" }{% if not forloop.last %},{% endif %}
+                {% endfor %}
+            ]{% if not forloop.last %},{% endif %}
+        {% endfor %}
+    };
+    
+    function updateSubcategories() {
+        const categoryId = categorySelect.value;
+        
+        // Limpa as opções atuais
+        subcategorySelect.innerHTML = '<option value="">Selecione a subcategoria</option>';
+        
+        if (categoryId && subcategoriesByCategory[categoryId]) {
+            const subcategories = subcategoriesByCategory[categoryId];
+            
+            if (subcategories.length > 0) {
+                // Adiciona as subcategorias
+                subcategories.forEach(function(subcat) {
+                    const option = document.createElement('option');
+                    option.value = subcat.id;
+                    option.textContent = subcat.name;
+                    subcategorySelect.appendChild(option);
+                });
+                
+                // Mostra o campo e marca como obrigatório
+                subcategoryField.style.display = 'block';
+                subcategorySelect.required = true;
+                subcategoryRequired.style.display = 'inline';
+            } else {
+                // Esconde o campo se não há subcategorias
+                subcategoryField.style.display = 'none';
+                subcategorySelect.required = false;
+                subcategoryRequired.style.display = 'none';
+            }
+        } else {
+            // Esconde o campo se nenhuma categoria selecionada
+            subcategoryField.style.display = 'none';
+            subcategorySelect.required = false;
+            subcategoryRequired.style.display = 'none';
+        }
+    }
+    
+    // Executa ao carregar a página (caso já tenha categoria selecionada)
+    if (categorySelect) {
+        updateSubcategories();
+        
+        // Escuta mudanças na categoria
+        categorySelect.addEventListener('change', updateSubcategories);
+    }
+});
+</script>
 {% endblock content %}

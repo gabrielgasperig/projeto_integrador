@@ -30,7 +30,13 @@ class RegisterUpdateForm(forms.ModelForm):
     last_name = forms.CharField(
         min_length=3, max_length=30, required=True, label='Sobrenome'
     )
-    email = forms.EmailField(required=True)
+    email = forms.EmailField(required=True, label='E-mail')
+    
+    username = forms.CharField(
+        label='Nome de Usuário',
+        disabled=True,
+        help_text='O nome de usuário não pode ser alterado.'
+    )
 
     password = forms.CharField(
         label="Nova Senha",
@@ -46,6 +52,7 @@ class RegisterUpdateForm(forms.ModelForm):
         widget=forms.PasswordInput(attrs={"autocomplete": "new-password"}),
         required=False,
     )
+    
     class Meta:
         model = User
         fields = (
@@ -53,7 +60,10 @@ class RegisterUpdateForm(forms.ModelForm):
             'username',
         )
     def save(self, commit=True):
-        user = super().save(commit=False)       
+        user = super().save(commit=False)
+        # Garante que o username não seja alterado
+        if self.instance and self.instance.pk:
+            user.username = self.instance.username
         password = self.cleaned_data.get('password')
         if password:
             user.set_password(password)

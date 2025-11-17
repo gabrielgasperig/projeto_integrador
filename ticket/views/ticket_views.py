@@ -14,7 +14,7 @@ from django.core.paginator import Paginator
 # Importações locais
 from ..models import Ticket, TicketEvent, TicketImage
 from ..forms import (
-    TicketForm, ConcludeTicketForm, DeleteTicketForm, RatingForm, TransferTicketForm, TicketEventForm, AdminSetPriorityForm
+    TicketForm, ConcludeTicketForm, DeleteTicketForm, RatingForm, TransferTicketForm, TicketEventForm, PriorityForm
 )
 
 @login_required
@@ -132,8 +132,8 @@ def ticket_detail(request, ticket_id):
         'rating_form': rating_form,
         'transfer_form': TransferTicketForm(current_admin=ticket.assigned_to),
         'comment_form': comment_form,
-        # Exibe formulário de prioridade apenas enquanto estiver "A definir"
-        'priority_form': AdminSetPriorityForm() if (request.user.is_staff and ticket.status != 'Fechado' and ticket.priority == 'A definir') else None,
+        
+        'priority_form': PriorityForm() if (request.user.is_staff and ticket.status != 'Fechado' and ticket.priority == 'A definir') else None,
         'site_title': 'Ticket',
     }
     return render(request, 'ticket/ticket.html', context)
@@ -295,7 +295,7 @@ def assign_ticket(request, ticket_id):
     ticket = get_object_or_404(Ticket, pk=ticket_id)
     
     if request.method == 'POST':
-        form = AdminSetPriorityForm(request.POST)
+        form = PriorityForm(request.POST)
         if form.is_valid():
             priority = form.cleaned_data['priority']
             ticket.assigned_to = request.user
@@ -349,13 +349,12 @@ def set_priority(request, ticket_id):
         messages.error(request, 'Ação não permitida.')
         return redirect('ticket:ticket_detail', ticket_id=ticket.id)
     
-    # Bloqueia alteração se já definida ou ticket fechado
     if ticket.status == 'Fechado' or ticket.priority != 'A definir':
         messages.error(request, 'Prioridade já definida ou ticket fechado; não é possível alterar.')
         return redirect('ticket:ticket_detail', ticket_id=ticket.id)
 
     if request.method == 'POST':
-        form = AdminSetPriorityForm(request.POST)
+        form = PriorityForm(request.POST)
         if form.is_valid():
             new_priority = form.cleaned_data['priority']
             ticket.priority = new_priority

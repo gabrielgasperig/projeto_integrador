@@ -13,6 +13,8 @@ def index(request):
     priority = request.GET.get('priority')
 
     filters = Q()
+    category = request.GET.get('category')
+    subcategory = request.GET.get('subcategory')
     if start_date:
         filters &= Q(created_date__gte=start_date)
     if end_date:
@@ -21,6 +23,10 @@ def index(request):
         filters &= Q(assigned_to_id=assigned_to)
     if priority:
         filters &= Q(priority=priority)
+    if category:
+        filters &= Q(category_id=category)
+    if subcategory:
+        filters &= Q(subcategory_id=subcategory)
 
     tickets = Ticket.objects.filter(filters)
     total_tickets = tickets.count()
@@ -30,6 +36,8 @@ def index(request):
     
     tickets_by_status = tickets.values('status').annotate(count=Count('status'))
     tickets_by_priority = tickets.values('priority').annotate(count=Count('priority'))
+    tickets_by_category = tickets.values('category__name').annotate(count=Count('id')).order_by('-count')
+    tickets_by_subcategory = tickets.values('subcategory__name').annotate(count=Count('id')).order_by('-count')
 
     avg_resolution = tickets.filter(status='Fechado', closed_date__isnull=False).annotate(
         resolution_time=ExpressionWrapper(F('closed_date') - F('created_date'), output_field=DurationField())
@@ -68,6 +76,8 @@ def index(request):
         'closed_tickets': closed_tickets,
         'tickets_by_status': tickets_by_status,
         'tickets_by_priority': tickets_by_priority,
+        'tickets_by_category': tickets_by_category,
+        'tickets_by_subcategory': tickets_by_subcategory,
         'avg_resolution_time': avg_resolution_time,
         'sla_compliance_percentage': sla_compliance_percentage,
         'average_rating': average_rating,
