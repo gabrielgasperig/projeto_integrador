@@ -10,7 +10,7 @@ def add_working_hours(start, hours):
     work_periods = [(time(8, 0), time(12, 0)), (time(14, 0), time(18, 0))]
     
     while hours_left > 0:
-        if current.weekday() < 5:  # Monday to Friday
+        if current.weekday() < 5: # Segunda a Sexta
             for period_start, period_end in work_periods:
                 period_start_dt = current.replace(
                     hour=period_start.hour, 
@@ -199,7 +199,7 @@ class Ticket(models.Model):
         work_periods = [(time(8, 0), time(12, 0)), (time(14, 0), time(18, 0))]
         
         while current < end:
-            if current.weekday() < 5:  # Monday to Friday
+            if current.weekday() < 5: # Segunda a Sexta
                 for period_start, period_end in work_periods:
                     period_start_dt = current.replace(
                         hour=period_start.hour, 
@@ -300,7 +300,6 @@ class TicketEvent(models.Model):
 
 
 class TicketEventImage(models.Model):
-    """Images attached to ticket events."""
     event = models.ForeignKey(TicketEvent, on_delete=models.CASCADE, related_name='images')
     image = models.ImageField(upload_to='ticket_pictures/%Y/%m/')
     uploaded_at = models.DateTimeField(auto_now_add=True)

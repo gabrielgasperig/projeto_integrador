@@ -30,21 +30,16 @@ class TicketForm(forms.ModelForm):
     def __init__(self, *args, **kwargs):
         super().__init__(*args, **kwargs)
         
-        # Check if there are any categories
         has_categories = models.Category.objects.exists()
         
         if not has_categories:
-            # Hide category field if no categories exist
             self.fields['category'].widget = forms.HiddenInput()
             self.fields['category'].required = False
             self.fields['subcategory'].widget = forms.HiddenInput()
             self.fields['subcategory'].required = False
         else:
-            # If categories exist, make category required
             self.fields['category'].required = True
             
-            # Always keep subcategory as a Select widget (never HiddenInput)
-            # JavaScript will handle showing/hiding it
             category_id = None
             
             if 'category' in self.data:
@@ -71,11 +66,9 @@ class TicketForm(forms.ModelForm):
         category = cleaned_data.get('category')
         subcategory = cleaned_data.get('subcategory')
         
-        # If categories exist, category is required
         if models.Category.objects.exists() and not category:
             self.add_error('category', 'Por favor, selecione uma categoria.')
         
-        # If category has subcategories, subcategory is required
         if category:
             has_subcategories = models.Subcategory.objects.filter(category=category).exists()
             if has_subcategories and not subcategory:

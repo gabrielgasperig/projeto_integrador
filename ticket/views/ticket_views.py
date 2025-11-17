@@ -374,10 +374,6 @@ def set_priority(request, ticket_id):
 
 @login_required
 def solutions(request):
-    """
-    Página para exibir um banco de soluções de tickets fechados, com filtros.
-    Apenas administradores podem acessar esta página.
-    """
     if not request.user.is_staff:
         messages.error(request, 'Acesso negado. Você não tem permissão para acessar esta página.')
         return redirect('ticket:my_tickets')

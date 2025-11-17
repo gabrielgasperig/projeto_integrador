@@ -61,7 +61,6 @@ class RegisterUpdateForm(forms.ModelForm):
         )
     def save(self, commit=True):
         user = super().save(commit=False)
-        # Garante que o username não seja alterado
         if self.instance and self.instance.pk:
             user.username = self.instance.username
         password = self.cleaned_data.get('password')
