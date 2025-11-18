@@ -91,11 +91,11 @@ class Ticket(models.Model):
     ]
 
     RATING_CHOICES = [
-        (1, '⭐'),
-        (2, '⭐⭐'),
-        (3, '⭐⭐⭐'),
-        (4, '⭐⭐⭐⭐'),
-        (5, '⭐⭐⭐⭐⭐'),
+        (1, '1 estrela'),
+        (2, '2 estrelas'),
+        (3, '3 estrelas'),
+        (4, '4 estrelas'),
+        (5, '5 estrelas'),
     ]
 
     title = models.CharField(max_length=100, verbose_name="Título")

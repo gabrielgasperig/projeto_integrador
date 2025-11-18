@@ -116,7 +116,6 @@ class RatingForm(forms.ModelForm):
         model = models.Ticket
         fields = ['rating', 'feedback']
         widgets = {
-            'rating': forms.Select(attrs={'class': 'form-select'}),
             'feedback': forms.Textarea(attrs={
                 'rows': 3, 
                 'placeholder': 'Deixe um comentário sobre o atendimento (opcional)...'
