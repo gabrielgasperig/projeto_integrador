@@ -14,7 +14,8 @@ document.addEventListener('DOMContentLoaded', function() {
     function updateSubcategories() {
         const categoryId = categorySelect.value;
         
-        subcategorySelect.innerHTML = '<option value="">Selecione a subcategoria</option>';
+    subcategorySelect.innerHTML = '<option value="">Selecione a subcategoria</option>';
+    subcategorySelect.value = '';
         
         if (categoryId && window.subcategoriesByCategory[categoryId]) {
             const subcategories = window.subcategoriesByCategory[categoryId];
@@ -29,16 +30,22 @@ document.addEventListener('DOMContentLoaded', function() {
                 
                 subcategoryField.style.display = 'block';
                 subcategorySelect.required = true;
-                subcategoryRequired.style.display = 'inline';
+                if (subcategoryRequired) {
+                    subcategoryRequired.style.display = 'inline';
+                }
             } else {
                 subcategoryField.style.display = 'none';
                 subcategorySelect.required = false;
-                subcategoryRequired.style.display = 'none';
+                if (subcategoryRequired) {
+                    subcategoryRequired.style.display = 'none';
+                }
             }
         } else {
             subcategoryField.style.display = 'none';
             subcategorySelect.required = false;
-            subcategoryRequired.style.display = 'none';
+            if (subcategoryRequired) {
+                subcategoryRequired.style.display = 'none';
+            }
         }
     }
     
