@@ -12,7 +12,6 @@ jobs:
       - name: 'Checkout do Código'
         uses: actions/checkout@v4
 
-      # Configura a Conexão SSH
       - name: 'Deploy via SSH'
         uses: appleboy/ssh-action@v1.0.3
         with:
