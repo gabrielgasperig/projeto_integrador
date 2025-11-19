@@ -21,24 +21,17 @@ jobs:
           key: ${{ secrets.SSH_PRIVATE_KEY }}
           script: |
 
-            # Navega até a pasta do projeto
             cd /caminho/para/seu/projeto/django 
             
-            # Puxa as últimas alterações
             git pull origin main
             
-            # Ativa o ambiente virtual e instala dependências
             source venv/bin/activate
             pip install -r requirements.txt
             
-            # Aplica as migrações (essencial para o Django)
             python manage.py migrate --noinput
             
-            # Coleta arquivos estáticos
             python manage.py collectstatic --noinput
             
-            # Reinicia o servidor Gunicorn (ou seu processo principal)
             sudo systemctl restart gunicorn 
             
-            # Reinicia o Nginx para garantir que as novas configurações de domínio sejam carregadas
             sudo systemctl restart nginx
