@@ -12,19 +12,26 @@ jobs:
       - name: 'Checkout do Código'
         uses: actions/checkout@v4
 
-      # Configura a Conexão SSH usando a chave privada
+      # Configura a Conexão SSH
       - name: 'Deploy via SSH'
         uses: appleboy/ssh-action@v1.0.3
         with:
-          host: SEU_IP_ESTATICO_OU_DOMINIO 
-          username: SEU_USUARIO_NA_VM     
-          key: ${{ secrets.SSH_PRIVATE_KEY }}
+          host: ${{ vars.VM_HOST }}     
+          username: ${{ vars.VM_USER }}     
+          key: ${{ secrets.SSH_KEY }} 
           script: |
-
             cd /caminho/para/seu/projeto/django 
             
             git pull origin main
             
+            export SECRET_KEY="${{ secrets.SECRET_KEY }}"
+            export DB_ENGINE="${{ secrets.DB_ENGINE }}"
+            export DB_NAME="${{ secrets.DB_NAME }}"
+            export DB_USER="${{ secrets.DB_USER }}"
+            export DB_PASSWORD="${{ secrets.DB_PASSWORD }}"
+            export DB_HOST="${{ secrets.DB_HOST }}"
+            export DB_PORT="${{ secrets.DB_PORT }}"
+
             source venv/bin/activate
             pip install -r requirements.txt
             
