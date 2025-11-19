@@ -3,7 +3,6 @@ from django.contrib.auth import get_user_model
 from ticket.models import Ticket, TicketImage, TicketEvent
 from utils.gmail_integration import get_gmail_service
 from django.conf import settings
-
 from datetime import timedelta
 from django.core.files.base import ContentFile
 import base64
@@ -11,28 +10,38 @@ import email
 import re
 
 class Command(BaseCommand):
-    help = 'Importa e-mails do Gmail e cria tickets automaticamente.'
+    help = 'Import Gmail emails and create tickets automatically.'
 
     def handle(self, *args, **options):
         service = get_gmail_service()
         results = service.users().messages().list(userId='me', labelIds=['INBOX'], q='is:unread').execute()
         messages = results.get('messages', [])
         User = get_user_model()
+        # Palavras-chave para identificar e-mails de notificação do sistema
+        notification_keywords = [
+            'novo comentário no ticket',
+            'avaliação recebida no ticket',
+            'seu ticket foi fechado',
+        ]
         for msg in messages:
             msg_id = msg['id']
             msg_data = service.users().messages().get(userId='me', id=msg_id, format='full').execute()
             payload = msg_data['payload']
             headers = payload.get('headers', [])
-            subject = next((h['value'] for h in headers if h['name'] == 'Subject'), 'Sem título')
+            subject = next((h['value'] for h in headers if h['name'] == 'Subject'), 'No subject')
             from_email = next((h['value'] for h in headers if h['name'] == 'From'), None)
+            # Ignora e-mails de notificação do sistema pelo assunto
+            if any(keyword.lower() in subject.lower() for keyword in notification_keywords):
+                self.stdout.write(self.style.WARNING(f'Email ignored (system notification): {subject}'))
+                service.users().messages().modify(userId='me', id=msg_id, body={'removeLabelIds': ['UNREAD']}).execute()
+                continue
             # Extrai o e-mail do remetente (pode vir como 'Nome <email@dominio.com>')
             email_match = re.search(r'<(.+?)>', from_email) if from_email else None
             sender_email = email_match.group(1) if email_match else (from_email or '').strip()
             # Verifica se o remetente está cadastrado
             user = User.objects.filter(email__iexact=sender_email).first()
             if not user:
-                self.stdout.write(self.style.WARNING(f'Remetente não cadastrado: {sender_email}. Ticket não criado.'))
-                # Marca o e-mail como lido mesmo assim para não processar novamente
+                self.stdout.write(self.style.WARNING(f'Sender not registered: {sender_email}. Ticket not created.'))
                 service.users().messages().modify(userId='me', id=msg_id, body={'removeLabelIds': ['UNREAD']}).execute()
                 continue
             # Corpo do e-mail
@@ -44,17 +53,45 @@ class Command(BaseCommand):
                         break
             else:
                 body = base64.urlsafe_b64decode(payload['body']['data']).decode('utf-8')
-            # Define prioridade padrão e calcula o SLA igual ao sistema
-            prioridade = 'A definir'
+            # Extrai categoria e subcategoria do corpo do e-mail
+            category_name = None
+            subcategory_name = None
+            category_match = re.search(r'^Categoria:\s*(.+)$', body, re.MULTILINE | re.IGNORECASE)
+            subcategory_match = re.search(r'^Subcategoria:\s*(.+)$', body, re.MULTILINE | re.IGNORECASE)
+            if category_match:
+                category_name = category_match.group(1).strip()
+            if subcategory_match:
+                subcategory_name = subcategory_match.group(1).strip()
+            # Remove as linhas de categoria e subcategoria do corpo para a descrição
+            body_without_category = re.sub(r'^Categoria:.*\n?', '', body, flags=re.MULTILINE | re.IGNORECASE)
+            body_without_category = re.sub(r'^Subcategoria:.*\n?', '', body_without_category, flags=re.MULTILINE | re.IGNORECASE)
+            # Busca categoria e subcategoria no banco de dados
+            from ticket.models import Category, Subcategory
+            categories_exist = Category.objects.exists()
+            category_obj = None
+            subcategory_obj = None
+            if category_name:
+                category_obj = Category.objects.filter(name__iexact=category_name).first()
+            if subcategory_name and category_obj:
+                subcategory_obj = Subcategory.objects.filter(name__iexact=subcategory_name, category=category_obj).first()
+
+            # Só exige categoria se houver alguma cadastrada
+            if categories_exist and not category_obj:
+                self.stdout.write(self.style.WARNING(f"Category not found or not provided in email: '{category_name}'. Ticket not created."))
+                service.users().messages().modify(userId='me', id=msg_id, body={'removeLabelIds': ['UNREAD']}).execute()
+                continue
+            # Define prioridade padrão e calcula o SLA
+            priority = 'A definir'
             from django.utils import timezone
-            from ticket.models import Ticket
-            sla_deadline = Ticket.calculate_sla_deadline(timezone.now(), prioridade)
+            sla_deadline = Ticket.calculate_sla_deadline(timezone.now(), priority)
             ticket = Ticket.objects.create(
                 title=subject[:100],
-                description=body,
+                description=body_without_category.strip(),
                 owner=user,
-                priority=prioridade,
+                priority=priority,
                 sla_deadline=sla_deadline,
+                category=category_obj,
+                subcategory=subcategory_obj,
             )
             # Cria evento de criação no histórico
             TicketEvent.objects.create(
@@ -80,4 +117,4 @@ class Command(BaseCommand):
                             )
             # Marca o e-mail como lido
             service.users().messages().modify(userId='me', id=msg_id, body={'removeLabelIds': ['UNREAD']}).execute()
-            self.stdout.write(self.style.SUCCESS(f'Ticket criado: {ticket.title}'))
+            self.stdout.write(self.style.SUCCESS(f'Ticket created: {ticket.title}'))

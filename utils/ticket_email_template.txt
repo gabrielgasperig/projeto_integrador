@@ -1,0 +1,41 @@
+=========================================================================
+GUIA RÁPIDO: COMO ABRIR UM CHAMADO (TICKET) POR E-MAIL
+=========================================================================
+
+Para abrir um chamado corretamente, siga os 2 passos abaixo:
+
+-------------------------------------------------------------------------
+PASSO 1: O ASSUNTO DO E-MAIL
+-------------------------------------------------------------------------
+No campo "Assunto" do seu e-mail, escreva um título curto que resuma o 
+problema.
+
+Exemplos: 
+- Computador não liga
+- Erro no sistema de vendas
+- Solicitação de acesso
+
+-------------------------------------------------------------------------
+PASSO 2: O CORPO (MENSAGEM) DO E-MAIL
+-------------------------------------------------------------------------
+Copie o modelo abaixo, cole na mensagem do e-mail e preencha os campos.
+
+IMPORTANTE: 
+- Os campos "Categoria" e "Subcategoria" ajudam a classificar seu ticket.
+- Se você não souber qual categoria usar, pode deixar em branco.
+
+(COPIE O TEXTO ABAIXO)
+_________________________________________________________________________
+
+Categoria: [Digite aqui a Categoria - Ex: TI, Manutenção, RH]
+Subcategoria: [Digite aqui a Subcategoria - Ex: Internet, Impressora]
+
+[Apague este texto e descreva aqui sua solicitação com detalhes. 
+Informe o que aconteceu e se apareceu alguma mensagem de erro.]
+
+_________________________________________________________________________
+
+DICA FINAL: 
+Se tiver imagens, fotos ou "prints" da tela com o erro, lembre-se de 
+anexar os arquivos neste e-mail antes de enviar.
+=========================================================================
