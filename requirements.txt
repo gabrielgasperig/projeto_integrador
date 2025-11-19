@@ -11,9 +11,11 @@ google-auth==2.41.1
 google-auth-httplib2==0.2.1
 google-auth-oauthlib==1.2.3
 googleapis-common-protos==1.72.0
+gunicorn==23.0.0
 httplib2==0.31.0
 idna==3.11
 oauthlib==3.3.1
+packaging==25.0
 pillow==11.3.0
 proto-plus==1.26.1
 protobuf==6.33.0
