@@ -20,7 +20,7 @@ jobs:
           username: ${{ vars.VM_USER }}     
           key: ${{ secrets.SSH_KEY }} 
           script: |
-            cd /caminho/para/seu/projeto/django 
+            cd /home/gaabrielgasperi/gesticketapp 
             
             git pull origin main
             
