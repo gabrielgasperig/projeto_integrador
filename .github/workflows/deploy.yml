@@ -1,4 +1,4 @@
-name: 'Deploy VM (GCP)'
+name: 'Deploy'
 
 on:
   push:
@@ -16,30 +16,29 @@ jobs:
       - name: 'Deploy via SSH'
         uses: appleboy/ssh-action@v1.0.3
         with:
-          host: SEU_IP_ESTATICO_OU_DOMINIO # O domínio que você configurou no HostGator
-          username: SEU_USUARIO_NA_VM     # Ex: seu_usuario
+          host: SEU_IP_ESTATICO_OU_DOMINIO 
+          username: SEU_USUARIO_NA_VM     
           key: ${{ secrets.SSH_PRIVATE_KEY }}
           script: |
-            # --- Comandos executados DENTRO da sua VM ---
 
-            # 1. Navega até a pasta do projeto
+            # Navega até a pasta do projeto
             cd /caminho/para/seu/projeto/django 
             
-            # 2. Puxa as últimas alterações
+            # Puxa as últimas alterações
             git pull origin main
             
-            # 3. (Opcional) Ativa o ambiente virtual e instala dependências
+            # Ativa o ambiente virtual e instala dependências
             source venv/bin/activate
             pip install -r requirements.txt
             
-            # 4. Aplica as migrações (essencial para o Django)
+            # Aplica as migrações (essencial para o Django)
             python manage.py migrate --noinput
             
-            # 5. (Opcional) Coleta arquivos estáticos
+            # Coleta arquivos estáticos
             python manage.py collectstatic --noinput
             
-            # 6. Reinicia o servidor Gunicorn (ou seu processo principal)
+            # Reinicia o servidor Gunicorn (ou seu processo principal)
             sudo systemctl restart gunicorn 
             
-            # 7. Reinicia o Nginx para garantir que as novas configurações de domínio sejam carregadas
+            # Reinicia o Nginx para garantir que as novas configurações de domínio sejam carregadas
             sudo systemctl restart nginx
