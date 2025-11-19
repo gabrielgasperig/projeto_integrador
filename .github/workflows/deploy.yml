@@ -22,7 +22,7 @@ jobs:
           script: |
             cd /home/gaabrielgasperi/gesticketapp 
             
-            git pull origin main
+            git pull gesticketrepo main
             
             export SECRET_KEY="${{ secrets.SECRET_KEY }}"
             export DB_ENGINE="${{ secrets.DB_ENGINE }}"
