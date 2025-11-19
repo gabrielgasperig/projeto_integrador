@@ -39,6 +39,6 @@ jobs:
             
             python manage.py collectstatic --noinput
             
-            sudo systemctl restart gunicorn 
+            sudo systemctl restart gesticket 
             
             sudo systemctl restart nginx
