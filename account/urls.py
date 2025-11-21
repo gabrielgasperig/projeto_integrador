@@ -8,4 +8,6 @@ urlpatterns = [
     path('login/', views.login_view, name='login'),
     path('logout/', views.logout_view, name='logout'),
     path('profile/', views.user_update, name='user_update'),
+    path('confirm-email/<uuid:token>/', views.confirm_email_view, name='confirm_email'),
+    path('resend-confirmation/<int:user_id>/', views.resend_confirmation_email, name='resend_confirmation'),
 ]

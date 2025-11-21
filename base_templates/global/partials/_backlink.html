@@ -1,11 +1,23 @@
 <div class="mt-8">
-    {% if request.user.is_staff %}
-        <a href="{% url 'ticket:index' %}" class="text-blue-600 hover:text-blue-800 font-semibold">
-            &larr; Voltar para a Fila de Atendimento
+    {% if url and text %}
+        <a href="{{ url }}" class="text-blue-600 hover:text-blue-800 font-semibold flex items-center">
+            <svg class="w-4 h-4 mr-2" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M15 19l-7-7 7-7"/></svg>
+            {{ text|safe }}
+        </a>
+    {% elif not request.user.is_authenticated %}
+        <a href="{% url 'account:login' %}" class="text-blue-600 hover:text-blue-800 font-semibold flex items-center">
+            <svg class="w-4 h-4 mr-2" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M15 19l-7-7 7-7"/></svg>
+            Voltar para o Login
+        </a>
+    {% elif request.user.is_staff %}
+        <a href="{% url 'ticket:index' %}" class="text-blue-600 hover:text-blue-800 font-semibold flex items-center">
+            <svg class="w-4 h-4 mr-2" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M15 19l-7-7 7-7"/></svg>
+            Voltar para a Fila de Atendimento
         </a>
     {% else %}
-        <a href="{% url 'ticket:my_tickets' %}" class="text-blue-600 hover:text-blue-800 font-semibold">
-            &larr; Voltar para Meus Tickets
+        <a href="{% url 'ticket:my_tickets' %}" class="text-blue-600 hover:text-blue-800 font-semibold flex items-center">
+            <svg class="w-4 h-4 mr-2" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M15 19l-7-7 7-7"/></svg>
+            Voltar para Meus Tickets
         </a>
     {% endif %}
 </div>
