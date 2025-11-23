@@ -2,6 +2,7 @@ from django.shortcuts import render, get_object_or_404, redirect
 from django.contrib.auth.decorators import login_required
 from django.contrib import messages
 from django.utils import timezone
+from django.http import JsonResponse
 from datetime import timedelta, datetime
 import re
 from django.contrib.auth.models import User
@@ -45,6 +46,26 @@ def my_tickets(request):
     }
     return render(request, 'ticket/my_tickets.html', context)
 
+@login_required
+def check_my_tickets(request):
+    if request.user.is_staff:
+        return JsonResponse({'error': 'Unauthorized'}, status=403)
+    
+    open_count = Ticket.objects.filter(
+        owner=request.user
+    ).exclude(
+        status='Fechado'
+    ).count()
+    
+    closed_count = Ticket.objects.filter(
+        owner=request.user,
+        status='Fechado'
+    ).count()
+    
+    return JsonResponse({
+        'open_count': open_count,
+        'closed_count': closed_count
+    })
 
 
 

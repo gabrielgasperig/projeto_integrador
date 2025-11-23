@@ -2,6 +2,7 @@ from django.shortcuts import render, redirect
 from django.contrib.auth.decorators import login_required, user_passes_test
 from django.db.models import Q
 from django.core.paginator import Paginator
+from django.http import JsonResponse
 from datetime import timedelta, datetime
 
 # Importações locais
@@ -36,6 +37,27 @@ def index(request):
         'current_sort_assigned': sort_by_assigned,
     }
     return render(request, 'ticket/index.html', context)
+
+@login_required
+def check_new_tickets(request):
+    if not request.user.is_staff:
+        return JsonResponse({'error': 'Unauthorized'}, status=403)
+    
+    unassigned_count = Ticket.objects.filter(
+        status__in=['Aberto', 'Em Andamento'],
+        assigned_to=None
+    ).count()
+    
+    assigned_count = Ticket.objects.filter(
+        assigned_to=request.user
+    ).exclude(
+        status='Fechado'
+    ).count()
+    
+    return JsonResponse({
+        'unassigned_count': unassigned_count,
+        'assigned_count': assigned_count
+    })
 
 @login_required
 @user_passes_test(is_admin, login_url='ticket:index')

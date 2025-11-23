@@ -5,8 +5,10 @@ app_name = 'ticket'
 
 urlpatterns = [
     path('', admin_views.index, name='index'),
+    path('check-new-tickets/', admin_views.check_new_tickets, name='check_new_tickets'),
     
     path('meus-tickets/', ticket_views.my_tickets, name='my_tickets'),
+    path('check-my-tickets/', ticket_views.check_my_tickets, name='check_my_tickets'),
     path('todos-tickets/', admin_views.all_tickets, name='all_tickets'),
     path('solutions/', ticket_views.solutions, name='solutions'),
     path('ticket/create/', ticket_views.create, name='create'),

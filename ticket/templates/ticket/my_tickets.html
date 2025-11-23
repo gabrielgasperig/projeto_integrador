@@ -1,7 +1,24 @@
 {% extends 'global/base.html' %}
 
 {% block content %}
-<div class="p-4 md:p-8 min-h-screen" x-data="{ openTicketsOpen: true, closedTicketsOpen: true }" x-init="setInterval(() => { window.location.reload() }, 30000)">
+<div class="p-4 md:p-8 min-h-screen" x-data="{ 
+    openTicketsOpen: true, 
+    closedTicketsOpen: true,
+    openCount: {{ open_tickets|length }},
+    closedCount: {{ closed_tickets|length }}
+}" x-init="
+    setInterval(async () => {
+        try {
+            const response = await fetch('{% url 'ticket:check_my_tickets' %}');
+            const data = await response.json();
+            if (data.open_count !== openCount || data.closed_count !== closedCount) {
+                window.location.reload();
+            }
+        } catch (error) {
+            console.error('Erro ao verificar meus tickets:', error);
+        }
+    }, 10000)
+">
     <div class="flex items-center justify-between mb-6">
         <h1 class="text-2xl md:text-3xl font-bold text-gray-800">
             Meus Tickets
