@@ -2,8 +2,21 @@ document.addEventListener('DOMContentLoaded', function() {
     const categorySelect = document.getElementById('id_category');
     const subcategorySelect = document.getElementById('id_subcategory');
     const subcategoryInfo = document.getElementById('subcategory-info');
+    const locationSelect = document.getElementById('id_location');
     
     if (!categorySelect || !subcategorySelect) return;
+    
+    // Verificar e bloquear campo de categoria se estiver vazio
+    if (categorySelect.options.length <= 1) {
+        categorySelect.disabled = true;
+        categorySelect.required = false;
+    }
+    
+    // Verificar e bloquear campo de local se estiver vazio
+    if (locationSelect && locationSelect.options.length <= 1) {
+        locationSelect.disabled = true;
+        locationSelect.required = false;
+    }
     
     if (typeof window.subcategoriesByCategory === 'undefined') {
         console.warn('subcategoriesByCategory não está definido');

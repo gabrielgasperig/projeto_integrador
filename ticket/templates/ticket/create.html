@@ -41,7 +41,11 @@
                     <label for="{{ form.category.id_for_label }}" class="block text-sm font-medium text-gray-700">
                         {{ form.category.label }}
                     </label>
-                    {% render_field form.category class="mt-1 block w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-2 focus:ring-blue-500" id="id_category" %}
+                    {% if form.category.field.queryset.count == 0 %}
+                        {% render_field form.category class="mt-1 block w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-2 focus:ring-blue-500 disabled:bg-gray-100 disabled:cursor-not-allowed" id="id_category" disabled="disabled" %}
+                    {% else %}
+                        {% render_field form.category class="mt-1 block w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-2 focus:ring-blue-500" id="id_category" %}
+                    {% endif %}
                     {% if form.category.field.queryset.count == 0 %}
                         <p class="mt-1 text-xs text-amber-600 italic">Nenhuma categoria cadastrada no sistema.</p>
                     {% endif %}
@@ -65,7 +69,11 @@
                     <label for="{{ form.location.id_for_label }}" class="block text-sm font-medium text-gray-700">
                         {{ form.location.label }}
                     </label>
-                    {% render_field form.location class="mt-1 block w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-2 focus:ring-blue-500" %}
+                    {% if form.location.field.queryset.count == 0 %}
+                        {% render_field form.location class="mt-1 block w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-2 focus:ring-blue-500 disabled:bg-gray-100 disabled:cursor-not-allowed" disabled="disabled" %}
+                    {% else %}
+                        {% render_field form.location class="mt-1 block w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-2 focus:ring-blue-500" %}
+                    {% endif %}
                     {% if form.location.field.queryset.count == 0 %}
                         <p class="mt-1 text-xs text-amber-600 italic">Nenhum local cadastrado no sistema.</p>
                     {% endif %}
