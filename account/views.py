@@ -119,7 +119,6 @@ def logout_view(request):
     return redirect('account:login')
 
 def confirm_email_view(request, token):
-    """View para confirmar o e-mail do usuário através do token"""
     confirmation = get_object_or_404(EmailConfirmation, token=token)
     
     if confirmation.confirmed_at:
@@ -141,7 +140,6 @@ from django.views.decorators.http import require_http_methods
 
 @require_http_methods(["GET", "POST"])
 def resend_confirmation_email(request, user_id):
-    """View para reenviar e-mail de confirmação"""
     user = get_object_or_404(auth.get_user_model(), id=user_id)
 
     if user.is_active:

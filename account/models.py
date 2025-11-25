@@ -18,14 +18,12 @@ class EmailConfirmation(models.Model):
         return f'Confirmação de {self.user.email}'
     
     def is_valid(self):
-        """Verifica se o token ainda é válido (24 horas)"""
         if self.confirmed_at:
-            return False
+            return True
         expiration = self.created_at + timezone.timedelta(hours=24)
         return timezone.now() < expiration
     
     def confirm(self):
-        """Confirma o e-mail do usuário"""
         self.confirmed_at = timezone.now()
         self.user.is_active = True
         self.user.save()
