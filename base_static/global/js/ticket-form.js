@@ -1,8 +1,7 @@
 document.addEventListener('DOMContentLoaded', function() {
     const categorySelect = document.getElementById('id_category');
-    const subcategoryField = document.getElementById('subcategory-field');
     const subcategorySelect = document.getElementById('id_subcategory');
-    const subcategoryRequired = document.getElementById('subcategory-required');
+    const subcategoryInfo = document.getElementById('subcategory-info');
     
     if (!categorySelect || !subcategorySelect) return;
     
@@ -11,11 +10,27 @@ document.addEventListener('DOMContentLoaded', function() {
         return;
     }
     
+    let totalSubcategories = 0;
+    for (let catId in window.subcategoriesByCategory) {
+        totalSubcategories += window.subcategoriesByCategory[catId].length;
+    }
+    
     function updateSubcategories() {
         const categoryId = categorySelect.value;
         
-    subcategorySelect.innerHTML = '<option value="">Selecione a subcategoria</option>';
-    subcategorySelect.value = '';
+        subcategorySelect.innerHTML = '<option value="">Selecione a subcategoria</option>';
+        subcategorySelect.value = '';
+        
+        if (totalSubcategories === 0) {
+            subcategorySelect.disabled = true;
+            subcategorySelect.required = false;
+            
+            if (subcategoryInfo) {
+                subcategoryInfo.textContent = 'Nenhuma subcategoria cadastrada no sistema.';
+                subcategoryInfo.style.display = 'block';
+            }
+            return;
+        }
         
         if (categoryId && window.subcategoriesByCategory[categoryId]) {
             const subcategories = window.subcategoriesByCategory[categoryId];
@@ -28,23 +43,24 @@ document.addEventListener('DOMContentLoaded', function() {
                     subcategorySelect.appendChild(option);
                 });
                 
-                subcategoryField.style.display = 'block';
+                subcategorySelect.disabled = false;
                 subcategorySelect.required = true;
-                if (subcategoryRequired) {
-                    subcategoryRequired.style.display = 'inline';
+                if (subcategoryInfo) {
+                    subcategoryInfo.style.display = 'none';
                 }
             } else {
-                subcategoryField.style.display = 'none';
+                subcategorySelect.disabled = true;
                 subcategorySelect.required = false;
-                if (subcategoryRequired) {
-                    subcategoryRequired.style.display = 'none';
+                if (subcategoryInfo) {
+                    subcategoryInfo.textContent = 'Nenhuma subcategoria cadastrada para esta categoria.';
+                    subcategoryInfo.style.display = 'block';
                 }
             }
         } else {
-            subcategoryField.style.display = 'none';
+            subcategorySelect.disabled = true;
             subcategorySelect.required = false;
-            if (subcategoryRequired) {
-                subcategoryRequired.style.display = 'none';
+            if (subcategoryInfo) {
+                subcategoryInfo.style.display = 'none';
             }
         }
     }

@@ -17,6 +17,12 @@ class TicketForm(forms.ModelForm):
         label="Subcategoria",
         empty_label="Selecione a subcategoria"
     )
+    location = forms.ModelChoiceField(
+        queryset=models.Location.objects.filter(is_active=True),
+        required=False,
+        label="Local",
+        empty_label="Selecione o local"
+    )
     images = forms.ImageField(
         label="Anexar Imagens",
         widget=forms.FileInput(),
@@ -25,54 +31,53 @@ class TicketForm(forms.ModelForm):
     
     class Meta:
         model = models.Ticket
-        fields = ('title', 'description', 'category', 'subcategory')
+        fields = ('title', 'description', 'category', 'subcategory', 'location')
 
     def __init__(self, *args, **kwargs):
         super().__init__(*args, **kwargs)
         
         has_categories = models.Category.objects.exists()
+        has_locations = models.Location.objects.filter(is_active=True).exists()
+
+        self.fields['category'].required = has_categories
         
-        if not has_categories:
-            self.fields['category'].widget = forms.HiddenInput()
-            self.fields['category'].required = False
-            self.fields['subcategory'].widget = forms.HiddenInput()
-            self.fields['subcategory'].required = False
+        category_id = None
+        if 'category' in self.data:
+            try:
+                category_id = int(self.data.get('category'))
+            except (ValueError, TypeError):
+                pass
+        elif self.instance.pk and self.instance.category:
+            category_id = self.instance.category.id
+
+        if category_id:
+            sub_qs = models.Subcategory.objects.filter(category_id=category_id)
+            self.fields['subcategory'].queryset = sub_qs
+            self.fields['subcategory'].required = sub_qs.exists()
         else:
-            self.fields['category'].required = True
-            
-            category_id = None
-            
-            if 'category' in self.data:
-                try:
-                    category_id = int(self.data.get('category'))
-                except (ValueError, TypeError):
-                    pass
-            elif self.instance.pk and self.instance.category:
-                category_id = self.instance.category.id
-                
-            if category_id:
-                subcats = models.Subcategory.objects.filter(category_id=category_id)
-                self.fields['subcategory'].queryset = subcats
-                if subcats.exists():
-                    self.fields['subcategory'].required = True
-                else:
-                    self.fields['subcategory'].required = False
-            else:
-                self.fields['subcategory'].queryset = models.Subcategory.objects.all()
-                self.fields['subcategory'].required = False
+            self.fields['subcategory'].queryset = models.Subcategory.objects.all()
+            self.fields['subcategory'].required = False
+
+        self.fields['location'].required = has_locations
     
     def clean(self):
         cleaned_data = super().clean()
         category = cleaned_data.get('category')
         subcategory = cleaned_data.get('subcategory')
+        location = cleaned_data.get('location')
         
-        if models.Category.objects.exists() and not category:
+        has_categories = models.Category.objects.exists()
+        if has_categories and not category:
             self.add_error('category', 'Por favor, selecione uma categoria.')
         
         if category:
             has_subcategories = models.Subcategory.objects.filter(category=category).exists()
             if has_subcategories and not subcategory:
                 self.add_error('subcategory', 'Por favor, selecione uma subcategoria.')
+        
+        has_locations = models.Location.objects.filter(is_active=True).exists()
+        if has_locations and not location:
+            self.add_error('location', 'Por favor, selecione um local.')
         
         return cleaned_data
 

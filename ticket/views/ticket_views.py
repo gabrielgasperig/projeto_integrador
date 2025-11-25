@@ -153,7 +153,7 @@ def ticket_detail(request, ticket_id):
         'rating_form': rating_form,
         'transfer_form': TransferTicketForm(current_admin=ticket.assigned_to),
         'comment_form': comment_form,
-        
+        'staff_users': User.objects.filter(is_staff=True).order_by('first_name','last_name'),
         'priority_form': PriorityForm() if (request.user.is_staff and ticket.status != 'Fechado' and ticket.priority == 'A definir') else None,
         'site_title': 'Ticket',
     }
@@ -317,9 +317,17 @@ def assign_ticket(request, ticket_id):
     
     if request.method == 'POST':
         form = PriorityForm(request.POST)
+        assigned_to_id = request.POST.get('assigned_to')
         if form.is_valid():
             priority = form.cleaned_data['priority']
-            ticket.assigned_to = request.user
+            chosen_user = request.user
+            if assigned_to_id:
+                try:
+                    candidate = User.objects.filter(is_staff=True).get(pk=assigned_to_id)
+                    chosen_user = candidate
+                except User.DoesNotExist:
+                    pass
+            ticket.assigned_to = chosen_user
             ticket.status = 'Em Andamento'
             ticket.priority = priority
             ticket.sla_deadline = Ticket.calculate_sla_deadline(timezone.now(), priority)
@@ -328,7 +336,7 @@ def assign_ticket(request, ticket_id):
                 ticket=ticket, 
                 user=request.user, 
                 event_type='STATUS', 
-                description=f"Ticket atribuído a {request.user.get_full_name()}. Status alterado para 'Em Andamento'. Prioridade definida como '{priority}'."
+                description=f"Ticket atribuído a {ticket.assigned_to.get_full_name()} por {request.user.get_full_name()}. Status alterado para 'Em Andamento'. Prioridade definida como '{priority}'."
             )
             messages.success(request, 'Ticket em andamento.')
             return redirect('ticket:ticket_detail', ticket_id=ticket.id)

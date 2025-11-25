@@ -45,6 +45,9 @@
                                 <a href="?sort={% if current_sort == 'subcategory' %}-subcategory{% else %}subcategory{% endif %}" class="hover:text-gray-900">Subcategoria</a>
                             </th>
                             <th class="px-5 py-3 border-b-2 border-gray-200 bg-gray-100 text-left text-xs font-semibold text-gray-600 uppercase">
+                                <a href="?sort={% if current_sort == 'location' %}-location{% else %}location{% endif %}" class="hover:text-gray-900">Local</a>
+                            </th>
+                            <th class="px-5 py-3 border-b-2 border-gray-200 bg-gray-100 text-left text-xs font-semibold text-gray-600 uppercase">
                                 <a href="?sort={% if current_sort == '-created_date' %}created_date{% else %}-created_date{% endif %}" class="hover:text-gray-900">Data de criação</a>
                             </th>
                             <th class="px-5 py-3 border-b-2 border-gray-200 bg-gray-100 text-left text-xs font-semibold text-gray-600 uppercase">
@@ -83,6 +86,9 @@
                                 {% endif %}
                             </td>
                             <td class="px-5 py-4 border-b border-gray-200 text-sm">
+                                <span class="text-sm text-gray-700">{{ ticket.location.name|default:"Não especificado" }}</span>
+                            </td>
+                            <td class="px-5 py-4 border-b border-gray-200 text-sm">
                                 <span class="text-sm">{{ ticket.created_date|date:"d/m/Y H:i" }}</span>
                             </td>
                             <td class="px-5 py-4 border-b border-gray-200 text-sm">
@@ -106,7 +112,7 @@
                             </td>
                         </tr>
                         {% empty %}
-                        <tr><td colspan="7" class="text-center py-10 text-gray-500">Não há tickets em aberto.</td></tr>
+                        <tr><td colspan="8" class="text-center py-10 text-gray-500">Não há tickets em aberto.</td></tr>
                         {% endfor %}
                     </tbody>
                 </table>
@@ -132,6 +138,9 @@
                             </th>
                             <th class="px-5 py-3 border-b-2 border-gray-200 bg-gray-100 text-left text-xs font-semibold text-gray-600 uppercase">
                                 <a href="?sort_closed={% if current_sort_closed == 'subcategory' %}-subcategory{% else %}subcategory{% endif %}" class="hover:text-gray-900">Subcategoria</a>
+                            </th>
+                            <th class="px-5 py-3 border-b-2 border-gray-200 bg-gray-100 text-left text-xs font-semibold text-gray-600 uppercase">
+                                <a href="?sort_closed={% if current_sort_closed == 'location' %}-location{% else %}location{% endif %}" class="hover:text-gray-900">Local</a>
                             </th>
                             <th class="px-5 py-3 border-b-2 border-gray-200 bg-gray-100 text-left text-xs font-semibold text-gray-600 uppercase">
                                 <a href="?sort_closed={% if current_sort_closed == '-closed_date' %}closed_date{% else %}-closed_date{% endif %}" class="hover:text-gray-900">Data de Conclusão</a>
@@ -170,6 +179,9 @@
                                 {% endif %}
                             </td>
                             <td class="px-5 py-4 border-b border-gray-200 text-sm">
+                                <span class="text-sm text-gray-700">{{ ticket.location.name|default:"Não especificado" }}</span>
+                            </td>
+                            <td class="px-5 py-4 border-b border-gray-200 text-sm">
                                 <span class="text-sm">{{ ticket.closed_date|date:"d/m/Y H:i" }}</span>
                             </td>
                             <td class="px-5 py-4 border-b border-gray-200 text-sm">
@@ -202,7 +214,7 @@
                             </td>
                         </tr>
                         {% empty %}
-                        <tr><td colspan="7" class="text-center py-10 text-gray-500">Não há tickets concluídos.</td></tr>
+                        <tr><td colspan="8" class="text-center py-10 text-gray-500">Não há tickets concluídos.</td></tr>
                         {% endfor %}
                     </tbody>
                 </table>

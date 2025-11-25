@@ -2,81 +2,108 @@
 {% load widget_tweaks %}
 
 {% block content %}
-<div class="container mx-auto p-4 md:p-8 min-h-screen" x-data="{ showConcludeModal: false, showDeleteModal: false, showTransferModal: false, showPriorityModal: false }">
+<div class="container mx-auto p-4 md:p-8 min-h-screen mt-4 md:mt-6" x-data="{ showConcludeModal: false, showDeleteModal: false, showTransferModal: false, showPriorityModal: false }">
     <div class="bg-white p-6 rounded-lg shadow-lg max-w-4xl mx-auto">
         
-       <div class="mb-6 border-b pb-4">
-            <h1 class="text-3xl font-bold text-gray-900">{{ ticket.title }}</h1>
-            
-            <div class="mt-4 flex flex-wrap items-center justify-between gap-y-2 text-sm">
-                
-                <div class="flex flex-wrap items-center gap-x-6 gap-y-2">
-                    {% if ticket.category %}
-                    <span class="font-semibold flex items-center gap-2">
-                        Categoria: 
-                        <span class="px-2 py-1 rounded-md text-xs font-medium bg-blue-100 text-blue-800">{{ ticket.category.name }}</span>
-                    </span>
-                    {% endif %}
-                    {% if ticket.subcategory %}
-                    <span class="font-semibold flex items-center gap-2">
-                        Subcategoria: 
-                        <span class="px-2 py-1 rounded-md text-xs font-medium bg-blue-100 text-blue-800">{{ ticket.subcategory.name }}</span>
-                    </span>
-                    {% endif %}
-                    <span class="font-semibold flex items-center gap-2">Prioridade: 
-                        <span class="px-2 py-1 rounded-md text-xs font-medium
-                            {% if ticket.priority == 'Baixa' %} bg-gray-100 text-gray-800 {% endif %}
-                            {% if ticket.priority == 'Média' %} bg-yellow-100 text-yellow-800 {% endif %}
-                            {% if ticket.priority == 'Alta' %} bg-orange-100 text-orange-800 {% endif %}
-                            {% if ticket.priority == 'Urgente' %} bg-red-100 text-red-800 {% endif %}
-                        ">
-                            {{ ticket.get_priority_display }}
-                        </span>
-                    </span>
-                    <span class="font-semibold flex items-center gap-2">
-                        Status: 
-                        <span class="px-2 py-1 rounded-md text-xs font-medium
-                            {% if ticket.status == 'Aberto' %} bg-blue-100 text-blue-800 {% endif %}
-                            {% if ticket.status == 'Em Andamento' %} bg-yellow-100 text-yellow-800 {% endif %}
-                            {% if ticket.status == 'Fechado' %} bg-green-100 text-green-800 {% endif %}
-                        ">{{ ticket.status }}</span>
-                    </span>
-                     {% if ticket.sla_deadline %}
-                    <span class="font-semibold flex items-center gap-2">
-                        Prazo SLA:
-                        {% with sla_status=ticket.sla_status %}
-                            <span class="px-2 py-1 rounded-md text-xs font-medium
-                                {% if sla_status == 'No Prazo' %} bg-gray-100 text-gray-800 {% endif %}
-                                {% if sla_status == 'Atenção' %} bg-yellow-100 text-yellow-800 {% endif %}
-                                {% if sla_status == 'Violado' %} bg-red-100 text-red-800 {% endif %}
-                                {% if sla_status == 'Cumprido' %} bg-green-100 text-green-800 {% endif %}
-                            ">
-                                {{ sla_status }}
-                            </span>
-                        {% endwith %}
-                    </span>
-                    {% endif %}
-                    <span class="font-semibold">
-                        Responsável: 
-                        <span class="px-2 py-1 rounded-md text-xs font-medium">
-                            {{ ticket.assigned_to.get_full_name|default:"A definir" }}
-                        </span>
-                    </span>
-                </div>
-
-                <div class="flex items-center gap-2">
+       <div class="mb-6 border-b pb-6">
+            <div class="flex flex-col md:flex-row md:items-start md:justify-between gap-4 mb-6">
+                <h1 class="text-3xl font-bold text-gray-900 flex-grow basis-0 min-w-0 break-words leading-tight md:mr-4">{{ ticket.title }}</h1>
+                <div class="flex flex-wrap gap-2 md:justify-end flex-none md:flex-shrink-0 w-full md:w-auto">
                     {% if not ticket.assigned_to and request.user.is_staff and ticket.status == 'Aberto' %}
-                        <button @click="showPriorityModal = true" class="mt-2 bg-blue-600 text-white px-4 py-2 rounded-md hover:bg-blue-700 font-semibold transition-colors">
-                            Atender
+                        <button @click="showPriorityModal = true" class="bg-blue-600 text-white px-4 py-2 rounded-md hover:bg-blue-700 font-semibold transition-colors">
+                            Iniciar Atendimento
                         </button>
                     {% endif %}
+
+                    {% if request.user == ticket.owner and not ticket.assigned_to %}
+                        <a href="{% url 'ticket:update' ticket.id %}" class="bg-indigo-500 text-white px-3 py-2 rounded-md hover:bg-indigo-600 text-sm font-semibold">Editar</a>
+                    {% endif %}
+                    {% if request.user == ticket.owner and not ticket.assigned_to %}
+                        <button @click="showDeleteModal = true" class="bg-red-500 text-white px-3 py-2 rounded-md hover:bg-red-600 text-sm font-semibold">Excluir</button>
+                    {% endif %}
+
+                    {% if request.user.is_staff and ticket.status != 'Fechado' and ticket.assigned_to %}
+                        <button @click="showTransferModal = true" class="bg-indigo-500 text-white px-3 py-2 rounded-md hover:bg-indigo-600 text-sm font-semibold">Transferir</button>
+                    {% endif %}
+                    {% if request.user.is_staff and ticket.status != 'Fechado' and ticket.assigned_to and request.user == ticket.assigned_to %}
+                        <button @click="showConcludeModal = true" class="bg-green-500 text-white px-3 py-2 rounded-md hover:bg-green-600 text-sm font-semibold">Concluir Atendimento</button>
+                    {% endif %}
+                </div>
+            </div>
+            
+            <div class="bg-gray-50 rounded-lg p-4 space-y-4">
+                <div>
+                    <h3 class="text-xs font-bold text-gray-700 uppercase tracking-wider mb-3">Informações do Atendimento</h3>
+                    <div class="flex flex-wrap gap-4">
+                        <div class="flex items-center gap-2">
+                            <span class="text-xs text-gray-500">Status:</span>
+                            <span class="px-2 py-1 rounded-md text-xs font-medium
+                                {% if ticket.status == 'Aberto' %} bg-blue-100 text-blue-800 {% endif %}
+                                {% if ticket.status == 'Em Andamento' %} bg-yellow-100 text-yellow-800 {% endif %}
+                                {% if ticket.status == 'Fechado' %} bg-green-100 text-green-800 {% endif %}
+                            ">{{ ticket.status }}</span>
+                        </div>
+                        <div class="flex items-center gap-2">
+                            <span class="text-xs text-gray-500">Prioridade:</span>
+                            <span class="px-2 py-1 rounded-md text-xs font-medium
+                                {% if ticket.priority == 'Baixa' %} bg-gray-100 text-gray-800 {% endif %}
+                                {% if ticket.priority == 'Média' %} bg-yellow-100 text-yellow-800 {% endif %}
+                                {% if ticket.priority == 'Alta' %} bg-orange-100 text-orange-800 {% endif %}
+                                {% if ticket.priority == 'Urgente' %} bg-red-100 text-red-800 {% endif %}
+                            ">{{ ticket.get_priority_display }}</span>
+                        </div>
+                        {% if ticket.sla_deadline %}
+                        <div class="flex items-center gap-2">
+                            <span class="text-xs text-gray-500">SLA:</span>
+                            {% with sla_status=ticket.sla_status %}
+                                <span class="px-2 py-1 rounded-md text-xs font-medium
+                                    {% if sla_status == 'No Prazo' %} bg-gray-100 text-gray-800 {% endif %}
+                                    {% if sla_status == 'Atenção' %} bg-yellow-100 text-yellow-800 {% endif %}
+                                    {% if sla_status == 'Violado' %} bg-red-100 text-red-800 {% endif %}
+                                    {% if sla_status == 'Cumprido' %} bg-green-100 text-green-800 {% endif %}
+                                ">{{ sla_status }}</span>
+                            {% endwith %}
+                        </div>
+                        {% endif %}
+                        <div class="flex items-center gap-2">
+                            <span class="text-xs text-gray-500">Responsável:</span>
+                            <span class="text-sm text-gray-900 font-medium">{{ ticket.assigned_to.get_full_name|default:"A definir" }}</span>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="border-t border-gray-200"></div>
+
+                <div>
+                    <h3 class="text-xs font-bold text-gray-700 uppercase tracking-wider mb-3">Classificação</h3>
+                    <div class="flex flex-wrap gap-4">
+                        {% if ticket.category %}
+                        <div class="flex items-center gap-2">
+                            <span class="text-xs text-gray-500">Categoria:</span>
+                            <span class="px-2 py-1 rounded-md text-xs font-medium bg-blue-100 text-blue-800">{{ ticket.category.name }}</span>
+                        </div>
+                        {% endif %}
+                        {% if ticket.subcategory %}
+                        <div class="flex items-center gap-2">
+                            <span class="text-xs text-gray-500">Subcategoria:</span>
+                            <span class="px-2 py-1 rounded-md text-xs font-medium bg-blue-100 text-blue-800">{{ ticket.subcategory.name }}</span>
+                        </div>
+                        {% endif %}
+                        {% if ticket.location %}
+                        <div class="flex items-center gap-2">
+                            <span class="text-xs text-gray-500">Local:</span>
+                            <span class="text-sm text-gray-900 font-medium">{{ ticket.location.name }}</span>
+                        </div>
+                        {% endif %}
+                    </div>
                 </div>
             </div>
         </div>
         
-        <div class="mb-6">
+
+        <div class="mb-6 min-w-0">
             <h2 class="text-xl font-semibold text-gray-800 mb-2">Descrição do Problema</h2>
-            <p class="text-gray-700 whitespace-pre-wrap">{{ ticket.description }}</p>
+            <p class="text-gray-700 whitespace-pre-wrap break-words">{{ ticket.description }}</p>
             {% if ticket.images.all %}
                 <div class="mt-6">
                     <h4 class="text-lg font-semibold text-gray-700 mb-2">Anexos:</h4>
@@ -93,21 +120,7 @@
                 </div>
             {% endif %}
         </div>
-
-        <div class="flex flex-wrap items-center gap-2 mb-6">
-            {% if request.user == ticket.owner and not ticket.assigned_to %}
-                <a href="{% url 'ticket:update' ticket.id %}" class="bg-indigo-500 text-white px-3 py-2 rounded-md hover:bg-indigo-600 text-sm font-semibold">Editar</a>
-            {% endif %}
-            {% if request.user == ticket.owner and not ticket.assigned_to %}
-                 <button @click="showDeleteModal = true" class="bg-red-500 text-white px-3 py-2 rounded-md hover:bg-red-600 text-sm font-semibold">Excluir</button>
-            {% endif %}
-            {% if request.user.is_staff and ticket.status != 'Fechado' and ticket.assigned_to %}
-                <button @click="showTransferModal = true" class="bg-indigo-500 text-white px-3 py-2 rounded-md hover:bg-indigo-600 text-sm font-semibold">Transferir</button>
-            {% endif %}
-            {% if request.user.is_staff and ticket.status != 'Fechado' and ticket.assigned_to and request.user == ticket.assigned_to %}
-                <button @click="showConcludeModal = true" class="bg-green-500 text-white px-3 py-2 rounded-md hover:bg-green-600 text-sm font-semibold">Concluir Atendimento</button>
-            {% endif %}
-        </div>
+               
         
         <hr class="my-6">
 
@@ -288,8 +301,8 @@
     {% if ticket.priority == 'A definir' and request.user.is_staff and ticket.status == 'Aberto' %}
     <div x-show="showPriorityModal" class="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50 p-4" style="display: none;">
         <div @click.away="showPriorityModal = false" class="bg-white p-6 rounded-lg shadow-xl w-full max-w-md">
-            <h3 class="text-xl font-bold mb-4">Definir Prioridade</h3>
-            <p class="text-sm text-gray-600 mb-4">Para atender este ticket, é necessário definir a prioridade.</p>
+            <h3 class="text-xl font-bold mb-4">Iniciar Atendimento</h3>
+            <p class="text-sm text-gray-600 mb-4">Defina a prioridade e o atendente responsável.</p>
             <form action="{% url 'ticket:assign_ticket' ticket.id %}" method="POST">
                 {% csrf_token %}
                 <div class="space-y-4">
@@ -301,6 +314,14 @@
                                 {% if key != 'A definir' %}
                                     <option value="{{ key }}">{{ val }}</option>
                                 {% endif %}
+                            {% endfor %}
+                        </select>
+                    </div>
+                    <div>
+                        <label class="block text-sm font-medium text-gray-700 mb-2">Atendente</label>
+                        <select name="assigned_to" class="w-full p-2 border border-gray-300 rounded-md shadow-sm focus:ring-2 focus:ring-blue-500">
+                            {% for admin in staff_users %}
+                                <option value="{{ admin.id }}" {% if admin.id == request.user.id %}selected{% endif %}>{{ admin.get_full_name|default:admin.username }}</option>
                             {% endfor %}
                         </select>
                     </div>

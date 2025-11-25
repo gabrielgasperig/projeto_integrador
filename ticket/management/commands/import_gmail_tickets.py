@@ -1,6 +1,6 @@
 from django.core.management.base import BaseCommand
 from django.contrib.auth import get_user_model
-from ticket.models import Ticket, TicketImage, TicketEvent
+from ticket.models import Ticket, TicketImage, TicketEvent, Location
 from utils.gmail_integration import get_gmail_service
 from django.conf import settings
 from datetime import timedelta
@@ -53,27 +53,44 @@ class Command(BaseCommand):
                         break
             else:
                 body = base64.urlsafe_b64decode(payload['body']['data']).decode('utf-8')
-            # Extrai categoria e subcategoria do corpo do e-mail
+            # Extrai categoria, subcategoria e local do corpo do e-mail
             category_name = None
             subcategory_name = None
+            location_name = None
             category_match = re.search(r'^Categoria:\s*(.+)$', body, re.MULTILINE | re.IGNORECASE)
             subcategory_match = re.search(r'^Subcategoria:\s*(.+)$', body, re.MULTILINE | re.IGNORECASE)
+            location_match = re.search(r'^Local:\s*(.+)$', body, re.MULTILINE | re.IGNORECASE)
             if category_match:
                 category_name = category_match.group(1).strip()
             if subcategory_match:
                 subcategory_name = subcategory_match.group(1).strip()
-            # Remove as linhas de categoria e subcategoria do corpo para a descrição
+            if location_match:
+                location_name = location_match.group(2).strip()
+            # Remove linhas identificadoras do corpo para a descrição
             body_without_category = re.sub(r'^Categoria:.*\n?', '', body, flags=re.MULTILINE | re.IGNORECASE)
             body_without_category = re.sub(r'^Subcategoria:.*\n?', '', body_without_category, flags=re.MULTILINE | re.IGNORECASE)
-            # Busca categoria e subcategoria no banco de dados
+            body_without_category = re.sub(r'^Local:.*\n?', '', body_without_category, flags=re.MULTILINE | re.IGNORECASE)
+            # Busca categoria, subcategoria e local no banco de dados
             from ticket.models import Category, Subcategory
             categories_exist = Category.objects.exists()
             category_obj = None
             subcategory_obj = None
+            location_obj = None
             if category_name:
                 category_obj = Category.objects.filter(name__iexact=category_name).first()
             if subcategory_name and category_obj:
                 subcategory_obj = Subcategory.objects.filter(name__iexact=subcategory_name, category=category_obj).first()
+            if location_name:
+                location_obj = Location.objects.filter(name__iexact=location_name, is_active=True).first()
+            if not location_obj:
+                active_locations = list(Location.objects.filter(is_active=True))
+                detected = []
+                for loc in active_locations:
+                    pattern = r'\\b' + re.escape(loc.name) + r'\\b'
+                    if re.search(pattern, subject, re.IGNORECASE) or re.search(pattern, body, re.IGNORECASE):
+                        detected.append(loc)
+                if len(detected) == 1:
+                    location_obj = detected[0]
 
             # Só exige categoria se houver alguma cadastrada
             if categories_exist and not category_obj:
@@ -92,13 +109,17 @@ class Command(BaseCommand):
                 sla_deadline=sla_deadline,
                 category=category_obj,
                 subcategory=subcategory_obj,
+                location=location_obj,
             )
             # Cria evento de criação no histórico
+            creation_desc = 'Ticket criado por e-mail.'
+            if location_obj:
+                creation_desc += f" Local detectado: {location_obj.name}."
             TicketEvent.objects.create(
                 ticket=ticket,
                 user=user,
                 event_type='CRIAÇÃO',
-                description='Ticket criado por e-mail.'
+                description=creation_desc
             )
             # Salva anexos (imagens)
             if 'parts' in payload:

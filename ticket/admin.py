@@ -16,13 +16,22 @@ class SubcategoryAdmin(admin.ModelAdmin):
     list_display_links = ('id', 'name')
     ordering = ('category', 'name')
 
+@admin.register(models.Location)
+class LocationAdmin(admin.ModelAdmin):
+    list_display = ('id', 'name', 'description', 'is_active')
+    search_fields = ('name',)
+    list_filter = ('is_active',)
+    list_display_links = ('id', 'name')
+    list_editable = ('is_active',)
+    ordering = ('name',)
+
 @admin.register(models.Ticket)
 class TicketAdmin(admin.ModelAdmin):
-    list_display = ('id', 'title', 'category', 'status', 'priority', 'owner', 'assigned_to', 'created_date', 'show')
+    list_display = ('id', 'title', 'category', 'location', 'status', 'priority', 'owner', 'assigned_to', 'created_date', 'show')
     ordering = ('-id',)
     search_fields = ('id', 'title', 'description', 'owner__username', 'assigned_to__username')
     list_display_links = ('id', 'title')
-    list_filter = ('created_date', 'status', 'priority', 'category', 'assigned_to')
+    list_filter = ('created_date', 'status', 'priority', 'category', 'location', 'assigned_to')
     list_editable = ('show', 'status')
     list_per_page = 20
 

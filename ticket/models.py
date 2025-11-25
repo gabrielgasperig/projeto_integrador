@@ -74,6 +74,20 @@ class Subcategory(models.Model):
         return f"{self.category.name} - {self.name}"
 
 
+class Location(models.Model):
+    name = models.CharField(max_length=100, unique=True, verbose_name="Nome")
+    description = models.TextField(blank=True, null=True, verbose_name="Descrição")
+    is_active = models.BooleanField(default=True, verbose_name="Ativo")
+
+    class Meta:
+        verbose_name = 'Local'
+        verbose_name_plural = 'Locais'
+        ordering = ['name']
+
+    def __str__(self):
+        return self.name
+
+
 class Ticket(models.Model):
     
     STATUS_CHOICES = [
@@ -116,6 +130,14 @@ class Ticket(models.Model):
         blank=True, 
         related_name='tickets', 
         verbose_name='Subcategoria'
+    )
+    location = models.ForeignKey(
+        Location,
+        on_delete=models.SET_NULL,
+        null=True,
+        blank=True,
+        related_name='tickets',
+        verbose_name='Local'
     )
     
     status = models.CharField(

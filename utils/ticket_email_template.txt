@@ -27,8 +27,9 @@ IMPORTANTE:
 (COPIE O TEXTO ABAIXO)
 _________________________________________________________________________
 
-Categoria: [Digite aqui a Categoria - Ex: TI, Manutenção, RH]
-Subcategoria: [Digite aqui a Subcategoria - Ex: Internet, Impressora]
+Categoria: [Digite aqui a Categoria - Ex: Hardware, Software]
+Subcategoria: [Digite aqui a Subcategoria - Ex: Monitor, Impressora]
+Local: [Digite aqui o Local - Ex: RH, Financeiro]
 
 [Apague este texto e descreva aqui sua solicitação com detalhes. 
 Informe o que aconteceu e se apareceu alguma mensagem de erro.]
