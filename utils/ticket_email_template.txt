@@ -1,5 +1,5 @@
 =========================================================================
-GUIA RÁPIDO: COMO ABRIR UM CHAMADO (TICKET) POR E-MAIL
+GUIA RÁPIDO: COMO ABRIR UM TICKET POR E-MAIL
 =========================================================================
 
 Para abrir um chamado corretamente, siga os 2 passos abaixo:
@@ -16,7 +16,7 @@ Exemplos:
 - Solicitação de acesso
 
 -------------------------------------------------------------------------
-PASSO 2: O CORPO (MENSAGEM) DO E-MAIL
+PASSO 2: O CORPO DO E-MAIL
 -------------------------------------------------------------------------
 Copie o modelo abaixo, cole na mensagem do e-mail e preencha os campos.
 

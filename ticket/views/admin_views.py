@@ -5,7 +5,6 @@ from django.core.paginator import Paginator
 from django.http import JsonResponse
 from datetime import timedelta, datetime
 
-# Importações locais
 from ..models import Ticket
 
 def is_admin(user):
@@ -78,7 +77,9 @@ def all_tickets(request):
             Q(title__icontains=search_value) |
             Q(description__icontains=search_value) |
             Q(owner__first_name__icontains=search_value) |
-            Q(owner__last_name__icontains=search_value)
+            Q(owner__last_name__icontains=search_value) |
+            Q(assigned_to__first_name__icontains=search_value) |
+            Q(assigned_to__last_name__icontains=search_value)
         ).distinct()
     if status_filter:
         tickets_list = tickets_list.filter(status__iexact=status_filter)

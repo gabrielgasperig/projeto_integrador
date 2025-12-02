@@ -349,8 +349,7 @@ def assign_ticket(request, ticket_id):
 def transfer_ticket(request, ticket_id):
     ticket = get_object_or_404(Ticket, pk=ticket_id)
     
-    is_assigned_admin = request.user == ticket.assigned_to
-    if not (request.user.is_superuser or is_assigned_admin):
+    if not request.user.is_staff:
         messages.error(request, 'Não tem permissão para transferir este ticket.')
         return redirect('ticket:ticket_detail', ticket_id=ticket.id)
 

@@ -6,7 +6,10 @@
 <body class="h-full">
     {% include "global/partials/_messages.html" %}
 
-    <div class="flex h-full" x-data="{ isSidebarOpen: false, isMobileMenuOpen: false }" @keydown.escape.window="isMobileMenuOpen = false">
+        <div class="flex h-full"
+            x-data="{ isSidebarOpen: JSON.parse(localStorage.getItem('sidebarOpen') ?? 'false'), isMobileMenuOpen: false }"
+            x-init="$watch('isSidebarOpen', (val) => localStorage.setItem('sidebarOpen', JSON.stringify(val)))"
+            @keydown.escape.window="isMobileMenuOpen = false">
         
         {% if request.user.is_authenticated %}
             {% include "global/partials/_sidebar.html" %}

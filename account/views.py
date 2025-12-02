@@ -7,49 +7,54 @@ from django.core.mail import send_mail
 from django.template.loader import render_to_string
 from django.utils.html import strip_tags
 from django.conf import settings
+from django.contrib.auth.models import User
 
-from .forms import RegisterForm, RegisterUpdateForm
-from .models import EmailConfirmation
+from .forms import RegisterForm, RegisterUpdateForm, PasswordResetRequestForm, PasswordResetConfirmForm
+from .models import EmailConfirmation, PasswordReset
 
 def register_view(request):
     if request.user.is_authenticated:
         auth.logout(request)
         messages.info(request, 'Você foi desconectado para criar uma nova conta.')
     
-    form = RegisterForm(request.POST or None)
-    if form.is_valid():
-        try:
-            user = form.save(commit=False)
-            user.is_active = False
-            user.save()
-            
-            confirmation = EmailConfirmation.objects.create(user=user)
-            
-            confirmation_url = request.build_absolute_uri(
-                f'/account/confirm-email/{confirmation.token}/'
-            )
-            
-            html_message = render_to_string('account/email/confirmation_email.html', {
-                'user': user,
-                'confirmation_url': confirmation_url,
-            })
-            plain_message = strip_tags(html_message)
-            
-            send_mail(
-                subject='Confirme seu cadastro no Gesticket',
-                message=plain_message,
-                from_email=settings.EMAIL_HOST_USER,
-                recipient_list=[user.email],
-                html_message=html_message,
-                fail_silently=False,
-            )
-            
-            messages.success(request, 'Cadastro realizado! Verifique seu e-mail para confirmar sua conta.')
-            return redirect('account:login')
-        except Exception as e:
-            if 'user' in locals():
-                user.delete()
-            messages.error(request, f'Erro ao enviar e-mail de confirmação. Por favor, verifique seu e-mail e tente novamente. Erro: {str(e)}')
+    if request.method == 'POST':
+        form = RegisterForm(request.POST)
+        if form.is_valid():
+            try:
+                user = form.save(commit=False)
+                user.is_active = False
+                user.save()
+                
+                confirmation = EmailConfirmation.objects.create(user=user)
+                
+                confirmation_url = request.build_absolute_uri(
+                    f'/account/confirm-email/{confirmation.token}/'
+                )
+                
+                html_message = render_to_string('account/email/confirmation_email.html', {
+                    'user': user,
+                    'confirmation_url': confirmation_url,
+                })
+                plain_message = strip_tags(html_message)
+                
+                send_mail(
+                    subject='Confirme seu cadastro no Gesticket',
+                    message=plain_message,
+                    from_email=settings.EMAIL_HOST_USER,
+                    recipient_list=[user.email],
+                    html_message=html_message,
+                    fail_silently=False,
+                )
+                
+                messages.success(request, 'Cadastro realizado! Verifique seu e-mail para confirmar sua conta.')
+                return redirect('account:login')
+            except Exception as e:
+                if 'user' in locals() and user.pk:
+                    user.delete()
+                messages.error(request, f'Erro ao enviar e-mail de confirmação. Por favor, tente novamente. Erro: {str(e)}')
+    else:
+        form = RegisterForm()
+    
     context = {
         'form': form,
         'site_title': 'Cadastro',
@@ -183,3 +188,81 @@ def resend_confirmation_email(request, user_id):
         return redirect('account:login')
 
     return redirect('account:login')
+
+
+def password_reset_request(request):
+    if request.user.is_authenticated:
+        messages.info(request, 'Você já está logado!')
+        return redirect('ticket:index')
+    
+    form = PasswordResetRequestForm(request.POST or None)
+    
+    if form.is_valid():
+        email = form.cleaned_data['email']
+        user = User.objects.get(email=email, is_active=True)
+        
+        password_reset = PasswordReset.objects.create(user=user)
+        
+        reset_url = request.build_absolute_uri(
+            f'/account/reset-password/{password_reset.token}/'
+        )
+        
+        try:
+            html_message = render_to_string('account/email/password_reset_email.html', {
+                'user': user,
+                'reset_url': reset_url,
+            })
+            plain_message = strip_tags(html_message)
+            
+            send_mail(
+                subject='Recuperação de Senha - Gesticket',
+                message=plain_message,
+                from_email=settings.EMAIL_HOST_USER,
+                recipient_list=[user.email],
+                html_message=html_message,
+                fail_silently=False,
+            )
+            
+            messages.success(request, f'Um link de recuperação foi enviado para {email}. Verifique sua caixa de entrada.')
+            return redirect('account:login')
+        except Exception as e:
+            messages.error(request, 'Erro ao enviar e-mail. Por favor, tente novamente mais tarde.')
+            return redirect('account:password_reset_request')
+    
+    context = {
+        'form': form,
+        'site_title': 'Recuperar Senha',
+    }
+    return render(request, 'account/password_reset_request.html', context)
+
+
+def password_reset_confirm(request, token):
+    password_reset = get_object_or_404(PasswordReset, token=token)
+    
+    if not password_reset.is_valid():
+        if password_reset.used_at:
+            messages.error(request, 'Este link de recuperação já foi utilizado.')
+        else:
+            messages.error(request, 'Este link de recuperação expirou. Solicite um novo.')
+        return redirect('account:password_reset_request')
+    
+    form = PasswordResetConfirmForm(request.POST or None)
+    
+    if form.is_valid():
+        password = form.cleaned_data['password']
+        user = password_reset.user
+        
+        user.set_password(password)
+        user.save()
+        
+        password_reset.mark_as_used()
+        
+        messages.success(request, 'Senha alterada com sucesso! Você já pode fazer login.')
+        return redirect('account:login')
+    
+    context = {
+        'form': form,
+        'site_title': 'Redefinir Senha',
+        'token': token,
+    }
+    return render(request, 'account/password_reset_confirm.html', context)
